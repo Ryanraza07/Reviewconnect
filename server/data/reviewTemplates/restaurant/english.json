@@ -1,0 +1,115 @@
+{
+  "category": "restaurant",
+  "language": "English",
+  "openings": {
+    "simple": [
+      "My visit to {businessName} was a pleasant one.",
+      "I had a good experience at {businessName}.",
+      "I recently visited {businessName} and the experience was fair overall."
+    ],
+    "natural": [
+      "I visited {businessName} and had a generally positive experience.",
+      "My visit to {businessName} felt smooth and comfortable from start to finish.",
+      "I had a good time at {businessName} and wanted to share my honest take."
+    ],
+    "professional": [
+      "I recently visited {businessName} and found the overall experience to be satisfactory.",
+      "My experience at {businessName} was balanced and easy to evaluate.",
+      "I visited {businessName} and found the experience to be practical and worthwhile."
+    ],
+    "detailed": [
+      "I recently visited {businessName} and spent enough time there to form a clear impression.",
+      "I had the opportunity to visit {businessName}, and here is my honest assessment of the experience."
+    ],
+    "friendly": [
+      "I really enjoyed my time at {businessName} and wanted to share a quick review.",
+      "I had a nice visit to {businessName} and it left a positive impression on me."
+    ],
+    "casual": [
+      "I checked out {businessName} and it was a pretty good experience.",
+      "I dropped by {businessName} and had a smooth, easy visit."
+    ]
+  },
+  "closings": {
+    "simple": [
+      "Overall, it was a decent experience.",
+      "I would say it was worth visiting."
+    ],
+    "natural": [
+      "Overall, it felt worthwhile and I would consider returning.",
+      "The visit was good enough that I would recommend it to others."
+    ],
+    "professional": [
+      "Overall, the experience was satisfactory and useful to evaluate.",
+      "The visit was balanced and a fair experience overall."
+    ],
+    "detailed": [
+      "Overall, the visit felt well-rounded and I appreciated the attention to detail.",
+      "Overall, this was a practical and pleasant experience with room for continued improvement."
+    ],
+    "friendly": [
+      "I would happily recommend it to others.",
+      "I’d definitely consider visiting again."
+    ],
+    "casual": [
+      "That was my honest take, and I’d probably go back again.",
+      "Overall, it was a fair and pleasant visit."
+    ]
+  },
+  "additionalDetails": [
+    "One thing that stood out was {detail}",
+    "A detail that mattered to me was {detail}",
+    "I especially noticed {detail}"
+  ],
+  "components": {
+    "foodquality": [
+      "The food quality was satisfying.",
+      "The food was prepared well and felt fresh."
+    ],
+    "taste": [
+      "The taste was enjoyable and balanced.",
+      "The flavours felt good and well put together."
+    ],
+    "affordability": [
+      "The pricing felt reasonable for the experience.",
+      "The value for money was fair."
+    ],
+    "staff": [
+      "The staff were polite and helpful.",
+      "The team was friendly and attentive."
+    ],
+    "ambience": [
+      "The ambience was comfortable and welcoming.",
+      "The atmosphere was pleasant and relaxing."
+    ],
+    "cleanliness": [
+      "The place felt clean and well maintained.",
+      "The cleanliness stood out during the visit."
+    ],
+    "service": [
+      "The service was smooth and timely.",
+      "The experience felt easy and efficient."
+    ],
+    "location": [
+      "The location was convenient and easy to reach.",
+      "The place was easy to find and access."
+    ],
+    "overall": [
+      "The overall experience felt genuine and worth it.",
+      "Overall, the visit felt positive and practical."
+    ]
+  },
+  "categoryOptions": {
+    "restaurant": [
+      "foodquality",
+      "taste",
+      "affordability",
+      "staff",
+      "ambience",
+      "cleanliness",
+      "service",
+      "location",
+      "overall"
+    ]
+  }
+}

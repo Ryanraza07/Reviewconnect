@@ -1,0 +1,97 @@
+{
+  "category": "clinic",
+  "language": "Hinglish",
+  "openings": {
+    "simple": [
+      "Maine {businessName} visit kiya aur overall experience decent raha.",
+      "{businessName} ka visit practical aur manageable raha."
+    ],
+    "natural": [
+      "Maine {businessName} mein consultation liya aur experience smooth raha.",
+      "{businessName} ka experience organized aur comfortable laga."
+    ],
+    "professional": [
+      "Maine {businessName} mein service ka experience liya aur process clear laga.",
+      "{businessName} ka visit professional aur practical raha."
+    ],
+    "detailed": [
+      "Maine {businessName} ko thoughtful way mein assess kiya.",
+      "{businessName} ka clinic experience clear aur structured laga."
+    ],
+    "friendly": [
+      "Mera {businessName} ka visit good raha aur main feedback share karna chahta hoon.",
+      "Mujhe {businessName} mein comfort aur clarity mehsoos hui."
+    ],
+    "casual": [
+      "Maine {businessName} check kiya aur overall experience manageable raha.",
+      "{businessName} mein visit easy aur straightforward tha."
+    ]
+  },
+  "closings": {
+    "simple": [
+      "Overall, experience fair raha.",
+      "Visit manageable aur useful laga."
+    ],
+    "natural": [
+      "Overall, process smooth aur practical raha.",
+      "Mujhe experience useful aur acceptable laga."
+    ],
+    "professional": [
+      "Overall, care process professionally handled raha.",
+      "Visit organized aur satisfactory laga."
+    ],
+    "detailed": [
+      "Overall, clinic experience balanced aur informative raha.",
+      "Overall, experience practical aur manageable tha."
+    ],
+    "friendly": [
+      "Main isko recommend karna chahunga.",
+      "Agar zarurat pade to main firse visit karunga."
+    ],
+    "casual": [
+      "Yeh meri honest impression hai aur overall experience fair raha.",
+      "Overall, decent and manageable visit tha."
+    ]
+  },
+  "additionalDetails": [
+    "Ek cheez jo noticeable thi woh {detail}",
+    "Mere liye important point tha {detail}",
+    "Maine specifically {detail} par focus diya"
+  ],
+  "components": {
+    "staff": [
+      "Staff courteous aur helpful the.",
+      "Team supportive aur friendly tha."
+    ],
+    "doctorcommunication": [
+      "Doctor ne baat clear aur patiently explain ki.",
+      "Communication understandable aur reassuring raha."
+    ],
+    "waitingtime": [
+      "Waiting time manageable tha.",
+      "Appointment process efficient raha."
+    ],
+    "cleanliness": [
+      "Clinic clean aur well maintained laga.",
+      "Hygiene standards reassuring the."
+    ],
+    "appointmentexperience": [
+      "Appointment process smooth aur organized tha.",
+      "Booking aur check-in easy raha."
+    ],
+    "facility": [
+      "Facility comfortable aur good tha.",
+      "Environment practical aur reassuring laga."
+    ]
+  },
+  "categoryOptions": {
+    "clinic": [
+      "staff",
+      "doctorcommunication",
+      "waitingtime",
+      "cleanliness",
+      "appointmentexperience",
+      "facility"
+    ]
+  }
+}

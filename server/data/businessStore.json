@@ -1,0 +1,593 @@
+[
+  {
+    "businessName": "Raajput Restaurent",
+    "contactName": "Rajpoot",
+    "contactNumber": "809769598",
+    "location": "Ramnagar",
+    "locationLink": "https://www.google.com/maps/place/Rajput+Restaurant/@25.2552051,83.0551175,14.09z/data=!4m6!3m5!1s0x398e31a71573f457:0xcd0385d44997e36f!8m2!3d25.2430401!4d83.0374037!16s%2Fg%2F11g0zwpm33?entry=ttu&g_ep=EgoyMDI2MTEwMi4wIKXMDSoASAFQAw%3D%3D",
+    "businessSummary": "",
+    "businessProfileJson": "\n{\n  \"business\": {\n    \"name\": \"Rajput Restaurant\",\n    \"alternate_name\": \"BC Rajput Restaurant and Dhaba\",\n    \"category\": \"Restaurant and Dhaba\",\n    \"location\": {\n      \"address\": \"Bhandaha Kala, Kaithi, Varanasi, Uttar Pradesh 221116\",\n      \"latitude\": 25.2430401,\n      \"longitude\": 83.0374037\n    },\n    \"contact\": {\n      \"phone\": \"+91 70070 60409\"\n    },\n    \"google\": {\n      \"cid\": \"14779831041528918845\",\n      \"place_id\": \"Not independently verified\",\n      \"maps_cid\": \"0x398e31a71573f457:0xcd0385d44997e36f\"\n    },\n    \"rating\": {\n      \"score\": 4.2,\n      \"review_count\": 245,\n      \"source\": \"Business listing\",\n      \"verified_at\": \"2026-11-05\"\n    }\n  },\n\n  \"business_profile\": {\n    \"business_type\": \"Roadside dhaba\",\n    \"positioning\": \"Affordable, filling everyday meals\",\n    \"target_customers\": [\n      \"Highway travellers\",\n      \"Local residents\",\n      \"Families\",\n      \"Budget-conscious diners\",\n      \"Vegetarian customers\",\n      \"Non-vegetarian customers\"\n    ],\n    \"food_categories\": [\n      \"North Indian\",\n      \"Vegetarian\",\n      \"Non-vegetarian\",\n      \"Traditional Indian meals\"\n    ],\n    \"popular_items\": [\n      \"Veg thali\",\n      \"Paneer dishes\",\n      \"Roti\",\n      \"Chicken dishes\",\n      \"Mutton dishes\",\n      \"Tea\"\n    ],\n    \"facilities\": [\n      \"Dine-in\",\n      \"Takeaway\",\n      \"Food delivery\",\n      \"Outdoor seating\"\n    ],\n    \"price_positioning\": \"Budget-friendly\",\n    \"estimated_price_per_person\": \"₹200-₹400\"\n  },\n\n  \"review_analysis\": {\n    \"positive_themes\": [\n      {\n        \"theme\": \"Food taste\",\n        \"details\": \"Customers frequently describe food as tasty and delicious.\"\n      },\n      {\n        \"theme\": \"Value for money\",\n        \"details\": \"Affordable meals and economical veg thali are appreciated.\"\n      },\n      {\n        \"theme\": \"Staff behaviour\",\n        \"details\": \"Several customers appreciate friendly and helpful staff.\"\n      },\n      {\n        \"theme\": \"Non-vegetarian food\",\n        \"details\": \"Chicken and mutton dishes receive positive feedback.\"\n      },\n      {\n        \"theme\": \"Location convenience\",\n        \"details\": \"Convenient stop for travellers around the Kaithi route.\"\n      }\n    ],\n    \"negative_themes\": [\n      {\n        \"theme\": \"Cleanliness\",\n        \"details\": \"Some feedback raises concerns about hygiene and used plates.\"\n      },\n      {\n        \"theme\": \"Spice levels\",\n        \"details\": \"Some customers find certain dishes excessively spicy.\"\n      },\n      {\n        \"theme\": \"Ambience\",\n        \"details\": \"Basic dhaba-style atmosphere rather than premium dining.\"\n      }\n    ],\n    \"overall_sentiment\": \"Generally positive with some hygiene and consistency concerns\"\n  },\n\n  \"ai_review_context\": {\n    \"tone_options\": [\n      \"Casual\",\n      \"Natural\",\n      \"Detailed\",\n      \"Short\",\n      \"Professional\"\n    ],\n    \"potential_experience_topics\": [\n      \"Food taste\",\n      \"Thali value\",\n      \"Paneer dishes\",\n      \"Chicken and mutton dishes\",\n      \"Staff behaviour\",\n      \"Service speed\",\n      \"Cleanliness\",\n      \"Dining atmosphere\"\n    ],\n    \"generation_rules\": [\n      \"Use only the customer's actual experience.\",\n      \"Never invent dishes ordered.\",\n      \"Never assume the customer liked the food.\",\n      \"Allow balanced and negative feedback.\",\n      \"Do not copy existing customer reviews.\",\n      \"Do not force location keywords into reviews.\"\n    ]\n  },\n\n  \"data_quality\": {\n    \"business_identity\": \"Matched using supplied Google Maps CID\",\n    \"review_themes\": \"Aggregated third-party listing information\",\n    \"menu\": \"Partially identified\",\n    \"price\": \"Estimated\",\n    \"hours\": \"Require confirmation\",\n    \"place_id\": \"Unavailable\",\n    \"last_updated\": \"2026-11-05\"\n  }\n}\n",
+    "slug": "raajput-restaurent",
+    "category": "restaurant",
+    "description": "",
+    "logo": "https://res.cloudinary.com/jymmtdaq/image/upload/f_auto,q_auto/Neon_Question_Mark_Avatar_Badge",
+    "googleReviewUrl": "https://www.google.com/search?hl=en-IN&gl=in&q=Rajput+Restaurant+and+Dhaba&ludocid=14779831041528918845#lrd=0x398e31a71573f457:0xcd0385d44997e36f,3",
+    "branding": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "We value your feedback and would love to hear about your experience.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Food quality",
+        "key": "foodquality",
+        "enabled": true
+      },
+      {
+        "name": "Taste",
+        "key": "taste",
+        "enabled": true
+      },
+      {
+        "name": "Ambience",
+        "key": "ambience",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Pricing",
+        "key": "affordability",
+        "enabled": true
+      },
+      {
+        "name": "Location",
+        "key": "location",
+        "enabled": true
+      },
+      {
+        "name": "Hygiene",
+        "key": "hygiene",
+        "enabled": true
+      },
+      {
+        "name": "Freshness",
+        "key": "freshness",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "natural"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-05T16:10:52.435Z",
+    "updatedAt": "2026-11-05T16:24:11.018Z",
+    "__v": 0,
+    "id": "6aecaa8c1bb9421a049830da"
+  },
+  {
+    "businessName": "Moonvile Rooftop",
+    "contactName": "Arishfa",
+    "contactNumber": "803847583",
+    "location": "Mughalsarai",
+    "slug": "moonvile-rooftop",
+    "category": "restaurant",
+    "description": "",
+    "logo": "",
+    "googleReviewUrl": "https://www.google.com/search?hl=en-IN&gl=in&q=Moonville+Rooftop&ludocid=6828845646604461722#lrd=0x398e3b00541a21ad:0x5ec4d82c9c8f6e9a,3",
+    "branding": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "We value your feedback and would love to hear about your experience.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Food quality",
+        "key": "foodquality",
+        "enabled": true
+      },
+      {
+        "name": "Taste",
+        "key": "taste",
+        "enabled": true
+      },
+      {
+        "name": "Ambience",
+        "key": "ambience",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Pricing",
+        "key": "affordability",
+        "enabled": true
+      },
+      {
+        "name": "Location",
+        "key": "location",
+        "enabled": true
+      },
+      {
+        "name": "Hygiene",
+        "key": "hygiene",
+        "enabled": true
+      },
+      {
+        "name": "Freshness",
+        "key": "freshness",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "natural"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-04T08:47:15.762Z",
+    "updatedAt": "2026-11-05T15:26:23.259Z",
+    "__v": 0,
+    "businessProfileJson": "",
+    "businessSummary": "",
+    "locationLink": "https://www.google.com/maps/place/Moonville+Rooftop/@25.2922772,83.0997139,17z/data=!3m1!4b1!4m6!3m5!1s0x398e3b00541a21ad:0x5ec4d82c9c8f6e9a!8m2!3d25.2922772!4d83.0997139!16s%2Fg%2F11ybvdy9_d?entry=ttu&g_ep=EgoyMDI2MTEwMi4wIKXMDSoASAFQAw%3D%3D",
+    "id": "6aeaf113e1985ca90be74258"
+  },
+  {
+    "businessName": "Rajshree Clinic",
+    "contactName": "Harish chandra",
+    "contactNumber": "09736483829",
+    "location": "Mughalsarai",
+    "slug": "rajshree-clinic",
+    "category": "clinic",
+    "description": "",
+    "logo": "",
+    "googleReviewUrl": "https://maps.app.goo.gl/TnUd4Hsyt8RibUU58",
+    "branding": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "We value your feedback and would love to hear about your experience.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Doctor communication",
+        "key": "professionalism",
+        "enabled": true
+      },
+      {
+        "name": "Appointment experience",
+        "key": "appointment",
+        "enabled": true
+      },
+      {
+        "name": "Facility",
+        "key": "facility",
+        "enabled": true
+      },
+      {
+        "name": "Treatment quality",
+        "key": "treatment",
+        "enabled": true
+      },
+      {
+        "name": "Communication clarity",
+        "key": "communication",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      },
+      {
+        "name": "Waiting time",
+        "key": "waiting",
+        "enabled": true
+      },
+      {
+        "name": "Accessibility",
+        "key": "accessibility",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "natural"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-03T10:41:44.908Z",
+    "updatedAt": "2026-11-03T11:22:30.870Z",
+    "__v": 0,
+    "id": "6ae9ba68b0bf3ffd56d0b648"
+  },
+  {
+    "businessName": "Persistence Check Studio",
+    "contactName": "Naina Rao",
+    "contactNumber": "+91 90000 22222",
+    "location": "Powai, Mumbai",
+    "slug": "persistence-check-studio",
+    "category": "clinic",
+    "description": "",
+    "logo": "",
+    "googleReviewUrl": "",
+    "branding": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "Thanks for visiting us.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Care",
+        "key": "care",
+        "enabled": true
+      },
+      {
+        "name": "Staff",
+        "key": "staff",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "natural"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-03T10:17:59.136Z",
+    "updatedAt": "2026-11-03T10:17:59.136Z",
+    "__v": 0,
+    "id": "6ae9b4d7b0bf3ffd56d0b638"
+  },
+  {
+    "businessName": "The Coffee House",
+    "slug": "the-coffee-house",
+    "category": "restaurant",
+    "description": "A neighborhood café for coffee, brunch, and casual dining.",
+    "logo": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=200&q=80",
+    "googleReviewUrl": "https://www.google.com/search?q=The+Coffee+House+reviews",
+    "branding": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "Thanks for visiting us. We’d love to hear about your experience.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Food quality",
+        "key": "foodquality",
+        "enabled": true
+      },
+      {
+        "name": "Taste",
+        "key": "taste",
+        "enabled": true
+      },
+      {
+        "name": "Ambience",
+        "key": "ambience",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Pricing",
+        "key": "affordability",
+        "enabled": true
+      },
+      {
+        "name": "Location",
+        "key": "location",
+        "enabled": true
+      },
+      {
+        "name": "Hygiene",
+        "key": "hygiene",
+        "enabled": true
+      },
+      {
+        "name": "Freshness",
+        "key": "freshness",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "natural"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-03T10:01:26.355Z",
+    "updatedAt": "2026-11-03T10:01:26.355Z",
+    "__v": 0,
+    "id": "6ae9b108c53818ad2f76d711"
+  },
+  {
+    "businessName": "Royal Salon Studio",
+    "slug": "royal-salon-studio",
+    "category": "salon",
+    "description": "A premium salon for hair styling, grooming, and personal care.",
+    "logo": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=200&q=80",
+    "googleReviewUrl": "https://www.google.com/search?q=Royal+Salon+Studio+reviews",
+    "branding": {
+      "primaryColor": "#a855f7",
+      "secondaryColor": "#1f2937"
+    },
+    "welcomeMessage": "We value your honest feedback and would love to know how we did.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Ambience",
+        "key": "ambience",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Pricing",
+        "key": "affordability",
+        "enabled": true
+      },
+      {
+        "name": "Professionalism",
+        "key": "professionalism",
+        "enabled": true
+      },
+      {
+        "name": "Haircut quality",
+        "key": "styling",
+        "enabled": true
+      },
+      {
+        "name": "Aftercare",
+        "key": "aftercare",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      },
+      {
+        "name": "Timing",
+        "key": "timing",
+        "enabled": true
+      },
+      {
+        "name": "Consultation quality",
+        "key": "consultation",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "friendly"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-03T10:01:26.355Z",
+    "updatedAt": "2026-11-03T10:01:26.355Z",
+    "__v": 0,
+    "id": "6ae9b108c53818ad2f76d712"
+  },
+  {
+    "businessName": "City Dental Clinic",
+    "slug": "city-dental-clinic",
+    "category": "clinic",
+    "description": "A modern dental clinic focused on preventive and restorative care.",
+    "logo": "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=200&q=80",
+    "googleReviewUrl": "https://www.google.com/search?q=City+Dental+Clinic+reviews",
+    "branding": {
+      "primaryColor": "#14b8a6",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "Your feedback helps us improve the care and comfort we provide.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Doctor communication",
+        "key": "professionalism",
+        "enabled": true
+      },
+      {
+        "name": "Appointment experience",
+        "key": "appointment",
+        "enabled": true
+      },
+      {
+        "name": "Facility",
+        "key": "facility",
+        "enabled": true
+      },
+      {
+        "name": "Treatment quality",
+        "key": "treatment",
+        "enabled": true
+      },
+      {
+        "name": "Communication clarity",
+        "key": "communication",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      },
+      {
+        "name": "Waiting time",
+        "key": "waiting",
+        "enabled": true
+      },
+      {
+        "name": "Accessibility",
+        "key": "accessibility",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "professional"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-03T10:01:26.355Z",
+    "updatedAt": "2026-11-03T10:01:26.355Z",
+    "__v": 0,
+    "id": "6ae9b108c53818ad2f76d713"
+  }
+]

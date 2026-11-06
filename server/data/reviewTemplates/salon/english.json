@@ -1,0 +1,102 @@
+{
+  "category": "salon",
+  "language": "English",
+  "openings": {
+    "simple": [
+      "I visited {businessName} and had a straightforward experience.",
+      "My visit to {businessName} was reasonable overall."
+    ],
+    "natural": [
+      "I had a good experience at {businessName} and wanted to share my feedback.",
+      "My salon visit to {businessName} was smooth and fairly pleasant."
+    ],
+    "professional": [
+      "I recently visited {businessName} and found the service to be professional and organized.",
+      "My experience at {businessName} was practical and generally positive."
+    ],
+    "detailed": [
+      "I recently spent time at {businessName} and can say the service was clear and consistent.",
+      "I visited {businessName} and paid attention to the overall quality of the service."
+    ],
+    "friendly": [
+      "I had a nice experience at {businessName} and am happy to share it.",
+      "My visit to {businessName} left a positive impression on me."
+    ],
+    "casual": [
+      "I checked out {businessName} and the overall experience was pretty good.",
+      "I had a decent visit to {businessName} and it felt easy enough."
+    ]
+  },
+  "closings": {
+    "simple": [
+      "Overall, it was a fair experience.",
+      "It was worth the visit overall."
+    ],
+    "natural": [
+      "Overall, I felt satisfied with the visit and would consider coming back.",
+      "The service was good enough that I would be open to visiting again."
+    ],
+    "professional": [
+      "Overall, the service met expectations and felt well delivered.",
+      "The visit was balanced, practical, and useful overall."
+    ],
+    "detailed": [
+      "Overall, the experience felt polished and consistent, which made the visit worthwhile.",
+      "Overall, the service felt careful and professional, with room for continued improvement."
+    ],
+    "friendly": [
+      "I would recommend it to anyone looking for a straightforward salon visit.",
+      "I would happily go back for another visit."
+    ],
+    "casual": [
+      "That was my honest take, and I’d likely return.",
+      "Overall, it was a solid and pleasant visit."
+    ]
+  },
+  "additionalDetails": [
+    "One detail that stood out was {detail}",
+    "What mattered most to me was {detail}",
+    "I especially noticed {detail}"
+  ],
+  "components": {
+    "staff": [
+      "The staff were friendly and attentive.",
+      "The team made the experience feel comfortable and welcoming."
+    ],
+    "haircutquality": [
+      "The haircut quality was good and looked well done.",
+      "The result felt neat and suited my expectations."
+    ],
+    "professionalism": [
+      "The professionalism was clear and reassuring.",
+      "The service felt polished and thoughtful."
+    ],
+    "pricing": [
+      "The pricing felt reasonable for the service.",
+      "The value for the service was fair and acceptable."
+    ],
+    "hygiene": [
+      "The hygiene standards felt clean and reassuring.",
+      "The cleanliness and hygiene were well maintained."
+    ],
+    "ambience": [
+      "The ambience was relaxing and comfortable.",
+      "The salon environment felt pleasant and welcoming."
+    ],
+    "service": [
+      "The service flow was smooth and organized.",
+      "The experience felt efficient and easy overall."
+    ]
+  },
+  "categoryOptions": {
+    "salon": [
+      "staff",
+      "haircutquality",
+      "professionalism",
+      "pricing",
+      "hygiene",
+      "ambience",
+      "service"
+    ]
+  }
+}

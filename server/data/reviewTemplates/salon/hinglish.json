@@ -1,0 +1,102 @@
+{
+  "category": "salon",
+  "language": "Hinglish",
+  "openings": {
+    "simple": [
+      "Maine {businessName} visit kiya aur overall experience decent raha.",
+      "{businessName} mein visit practical aur fair raha."
+    ],
+    "natural": [
+      "Maine {businessName} mein service ka experience liya aur overall easy raha.",
+      "{businessName} ka visit smooth aur comfortable raha."
+    ],
+    "professional": [
+      "Maine {businessName} mein service ka experience liya aur professionalism clear thi.",
+      "{businessName} ka service organized aur professional laga."
+    ],
+    "detailed": [
+      "Maine {businessName} visit kar ke service ko closely observe kiya.",
+      "{businessName} ka experience detailed aur organized laga."
+    ],
+    "friendly": [
+      "Mera {businessName} visit good raha aur main share karna chahta hoon.",
+      "{businessName} mein time spend karna acha laga."
+    ],
+    "casual": [
+      "Maine {businessName} check kiya aur experience pretty good raha.",
+      "{businessName} mein visit smooth aur okay tha."
+    ]
+  },
+  "closings": {
+    "simple": [
+      "Overall, it was a fair experience.",
+      "Visit worth tha."
+    ],
+    "natural": [
+      "Overall, service good aur satisfying raha.",
+      "Mujhe fir se aana acha lag sakta hai."
+    ],
+    "professional": [
+      "Overall, service expectations ke according raha.",
+      "Experience balanced aur professional laga."
+    ],
+    "detailed": [
+      "Overall, experience consistent aur organized raha.",
+      "Overall, service thoughtful tha."
+    ],
+    "friendly": [
+      "Main definitely recommend karunga.",
+      "Mujhe phir se visit karna pasand aayega."
+    ],
+    "casual": [
+      "Yeh meri honest take hai, aur main firse aana chahunga.",
+      "Overall, solid and pleasant visit raha."
+    ]
+  },
+  "additionalDetails": [
+    "Ek cheez jo standout rahi woh thi {detail}",
+    "Mere liye important point tha {detail}",
+    "Maine specifically {detail} par focus diya"
+  ],
+  "components": {
+    "staff": [
+      "Staff friendly aur helpful the.",
+      "Team welcoming aur supportive thi."
+    ],
+    "haircutquality": [
+      "Haircut quality good thi aur neat lagi.",
+      "Result proper aur satisfactory laga."
+    ],
+    "professionalism": [
+      "Professionalism clear dhekha gaya.",
+      "Service polished aur thoughtful laga."
+    ],
+    "pricing": [
+      "Pricing reasonable thi.",
+      "Value for money fair raha."
+    ],
+    "hygiene": [
+      "Hygiene standards good the.",
+      "Cleanliness aur hygiene maintain thi."
+    ],
+    "ambience": [
+      "Ambience relaxing aur comfortable tha.",
+      "Place welcoming aur pleasant laga."
+    ],
+    "service": [
+      "Service flow smooth aur organized tha.",
+      "Experience easy aur efficient raha."
+    ]
+  },
+  "categoryOptions": {
+    "salon": [
+      "staff",
+      "haircutquality",
+      "professionalism",
+      "pricing",
+      "hygiene",
+      "ambience",
+      "service"
+    ]
+  }
+}
