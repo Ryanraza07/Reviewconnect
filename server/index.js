@@ -3,6 +3,8 @@ import cors from 'cors';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import fs from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { connectDB } from './config/db.js';
@@ -20,6 +22,8 @@ dotenv.config({ path: serverEnvPath });
 
 const app = express();
 const port = Number(process.env.PORT || 5000);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDistPath = path.resolve(__dirname, '../client/dist');
 
 app.use(
   cors({
@@ -59,6 +63,14 @@ app.get('/api/landing-page', (req, res) => {
 app.use('/api/businesses', businessRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes);
+
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+
+  app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 app.use(errorHandler);
 

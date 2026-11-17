@@ -209,7 +209,7 @@ export default function AdminPage() {
     }
   };
 
-  const publicBaseUrl = 'https://reviewconnection.onrender.com';
+  const publicBaseUrl = typeof window !== 'undefined' ? window.location.origin : (import.meta.env.VITE_PUBLIC_URL || 'http://localhost:5173');
   const qrUrl = (slug) => `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(`${publicBaseUrl}/b/${slug}`)}`;
 
   if (!loggedIn) {
