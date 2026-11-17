@@ -337,18 +337,6 @@ const simplifyCustomerNote = (value = '') => {
   return clean.replace(/\s+/g, ' ').slice(0, 220);
 };
 
-const getPhraseTargetCount = (tone = 'natural', selectedCount = 0) => {
-  if (['simple', 'short', 'friendly', 'casual'].includes(tone)) {
-    return Math.min(1, Math.max(1, selectedCount));
-  }
-
-  if (['professional', 'natural'].includes(tone)) {
-    return Math.min(2, Math.max(1, selectedCount));
-  }
-
-  return Math.min(3, Math.max(1, selectedCount));
-};
-
 const summarizeBusinessProfile = (businessProfileJson = '', businessSummary = '') => {
   const directSummary = String(businessSummary || '').trim();
   if (directSummary) return directSummary;
@@ -400,7 +388,10 @@ export function buildReviewGenerationPrompt({
 
   const summaryText = summarizeBusinessProfile(businessProfileJson, businessSummary);
   const locationText = String(businessLocation || '').trim();
-  const lengthRule = '- Keep it brief and SEO-friendly: 2 to 3 sentences total with natural local-search phrases like food quality, ambience, service, cleanliness, staff, location, or value.';
+  const lengthMode = Math.random() < 0.5 ? 'short' : 'medium';
+  const lengthRule = lengthMode === 'short'
+    ? '- Keep it brief: 2 to 4 sentences with a crisp, clean ending.'
+    : '- Keep it medium-length: 4 to 6 sentences with enough detail to feel real and personal.';
 
   return [
     'Generate a customer review for the business below.',
@@ -411,17 +402,15 @@ export function buildReviewGenerationPrompt({
     `Business profile JSON: ${businessProfileJson || 'not provided'}`,
     `Tone: ${tone}`,
     `Language: ${language}`,
+    `Review length: ${lengthMode}`,
     `Customer experience note: ${String(description || '').trim() || 'No extra note provided.'}`,
     locationText ? `Business location: ${locationText}` : 'Business location: not provided',
     'Requirements:',
-    '- Write in a natural, believable customer voice as if a real person is posting a review.',
+    '- Write in a natural, believable customer voice.',
     '- Keep the review focused on the selected tags and the business summary.',
-    '- Use 1 to 2 short, specific proof points that sound like genuine customer feedback, not marketing fluff.',
-    '- Do not use markdown, bullets, numbered lists, dashes, separators, or any special formatting like --- or ***.',
     '- Do not mention AI or automation.',
     '- Write in the requested tone and language.',
     '- Keep it positive, credible, and realistic.',
-    '- Make it sound human, casual, and believable with natural sentence flow.',
     lengthRule
   ].join('\n');
 }
@@ -462,6 +451,10 @@ export function generateReview({
   if (businessLocation) {
     contextNotes.push(`I visited ${businessName} in ${businessLocation}.`);
   }
+  if (contactName) {
+    contextNotes.push(`${contactName} and the team made the visit feel warm and easy.`);
+  }
+
   if (!categoryKeys.length && !description) {
     const genericClose = sentenceWithBusiness(
       pickOne(library.closings?.[templateTone] || library.closings?.natural || [
@@ -484,8 +477,7 @@ export function generateReview({
       return uniqueText([...basePool, ...expandedPool]);
     });
 
-    const targetPhraseCount = getPhraseTargetCount(templateTone, categoryKeys.length);
-    const chosenPhrases = uniqueText(pickMany(selectedPools, targetPhraseCount));
+    const chosenPhrases = uniqueText(pickMany(selectedPools, templateTone === 'detailed' ? 5 : 3));
     if (chosenPhrases.length) {
       reviewSegments.push(...chosenPhrases.map((phrase) => String(phrase).trim()));
     }
@@ -524,14 +516,6 @@ export function generateReview({
     .join(' ')
     .replace(/\s+/g, ' ')
     .trim();
-
-  if (finalText.length > 180) {
-    return `${finalText.slice(0, 175).trim().replace(/[.,;!?\s]+$/g, '')}.`;
-  }
-
-  if (finalText.length < 70) {
-    return `${finalText} Overall, it felt worth it and I would consider visiting again.`;
-  }
 
   return finalText;
 }
@@ -645,8 +629,7 @@ export async function generateReviewWithFallback({
   businessProfileJson = '',
   businessLocation = '',
   llmApiKey = '',
-  llmRequest = null,
-  llmTimeoutMs = Number(process.env.LLM_TIMEOUT_MS || 20000)
+  llmRequest = null
 }) {
   const normalized = normalizeReviewInput({
     businessName,
@@ -673,24 +656,19 @@ export async function generateReviewWithFallback({
         businessLocation: normalized.businessLocation
       });
 
-      const requestPromise = Promise.resolve(requestFn({
+      const response = await requestFn({
         model: process.env.LLM_MODEL || process.env.SENSENOVA_MODEL || process.env.SENSONOVA_MODEL || process.env.GROQ_MODEL || 'sensenova-v6-8-flash-lite',
         apiKey: llmApiKey,
         prompt,
         baseUrl: process.env.LLM_BASE_URL || process.env.SENSENOVA_BASE_URL || process.env.SENSONOVA_BASE_URL || process.env.GROQ_BASE_URL || 'https://token.sensenova.ai/v1'
-      }));
-
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error(`LLM request timed out after ${llmTimeoutMs}ms.`)), llmTimeoutMs);
       });
 
-      const response = await Promise.race([requestPromise, timeoutPromise]);
       const text = String(response || '').trim();
       if (text) {
         return text;
       }
     } catch (error) {
-      console.warn('[LLM] request failed or timed out, falling back to local generator:', error?.message || error);
+      console.warn('[LLM] request failed, falling back to local generator:', error?.message || error);
     }
   }
 

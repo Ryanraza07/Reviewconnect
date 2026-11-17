@@ -1,5 +1,290 @@
 [
   {
+    "businessName": "Information Technology",
+    "contactName": "Altaf Raza",
+    "contactNumber": "+917007234944",
+    "location": "Chandauli",
+    "locationLink": "",
+    "businessSummary": "",
+    "businessProfileJson": "",
+    "slug": "information-technology",
+    "category": "restaurant",
+    "description": "",
+    "logo": "",
+    "googleReviewUrl": "",
+    "branding": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "We value your feedback and would love to hear about your experience.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Food quality",
+        "key": "foodquality",
+        "enabled": true
+      },
+      {
+        "name": "Taste",
+        "key": "taste",
+        "enabled": true
+      },
+      {
+        "name": "Ambience",
+        "key": "ambience",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Pricing",
+        "key": "affordability",
+        "enabled": true
+      },
+      {
+        "name": "Location",
+        "key": "location",
+        "enabled": true
+      },
+      {
+        "name": "Hygiene",
+        "key": "hygiene",
+        "enabled": true
+      },
+      {
+        "name": "Freshness",
+        "key": "freshness",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "natural"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-17T15:47:24.361Z",
+    "updatedAt": "2026-11-17T15:47:24.361Z",
+    "__v": 0,
+    "id": "6afc770c41124fb6f86eb6d7"
+  },
+  {
+    "businessName": "jawed habib",
+    "contactName": "Altaf Raza",
+    "contactNumber": "+917007234944",
+    "location": "Lucknow",
+    "locationLink": "https://www.google.com/maps/place/The+Jawed+Habib+Sal%C3%B8n+IP+Mall+Mughalsarai/@25.3233219,83.0589186,13z/data=!4m10!1m2!2m1!1ssalon+neare+me!3m6!1s0x398e3be1562e0d9d:0x49f993abd85ad112!8m2!3d25.2938044!4d83.098693!15sCg1zYWxvbiBuZWFyIG1lIgOQAQFaDyINc2Fsb24gbmVhciBtZZIBDGJlYXV0eV9zYWxvbpoBJENoZERTVWhOTUc5blMwVkpRMEZuVFVSUmQwbFFiV2RCUlJBQuABAPoBBAgAEEE!16s%2Fg%2F11vlvm9lrb?entry=ttu&g_ep=EgoyMDI2MTExMC4wIKXMDSoASAFQAw%3D%3D",
+    "businessSummary": "",
+    "businessProfileJson": "",
+    "slug": "jawed-habib",
+    "category": "restaurant",
+    "description": "",
+    "logo": "",
+    "googleReviewUrl": "https://www.google.com/maps/place/The+Jawed+Habib+Sal%C3%B8n+IP+Mall+Mughalsarai/@25.3233219,83.0589186,13z/data=!4m10!1m2!2m1!1ssalon+neare+me!3m6!1s0x398e3be1562e0d9d:0x49f993abd85ad112!8m2!3d25.2938044!4d83.098693!15sCg1zYWxvbiBuZWFyIG1lIgOQAQFaDyINc2Fsb24gbmVhciBtZZIBDGJlYXV0eV9zYWxvbpoBJENoZERTVWhOTUc5blMwVkpRMEZuVFVSUmQwbFFiV2RCUlJBQuABAPoBBAgAEEE!16s%2Fg%2F11vlvm9lrb?entry=ttu&g_ep=EgoyMDI2MTExMC4wIKXMDSoASAFQAw%3D%3D",
+    "branding": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "We value your feedback and would love to hear about your experience.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Food quality",
+        "key": "foodquality",
+        "enabled": true
+      },
+      {
+        "name": "Taste",
+        "key": "taste",
+        "enabled": true
+      },
+      {
+        "name": "Ambience",
+        "key": "ambience",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Pricing",
+        "key": "affordability",
+        "enabled": true
+      },
+      {
+        "name": "Location",
+        "key": "location",
+        "enabled": true
+      },
+      {
+        "name": "Hygiene",
+        "key": "hygiene",
+        "enabled": true
+      },
+      {
+        "name": "Freshness",
+        "key": "freshness",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "natural"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-17T15:46:15.613Z",
+    "updatedAt": "2026-11-17T15:46:15.613Z",
+    "__v": 0,
+    "id": "6afc76c70b1ade46b797ed9c"
+  },
+  {
+    "businessName": "The Jawed Habib Saløn IP Mall Mughalsarai",
+    "contactName": "Altaf Raza",
+    "contactNumber": "+917007234944",
+    "location": "Chandauli",
+    "locationLink": "https://www.google.com/maps/place/The+Jawed+Habib+Sal%C3%B8n+IP+Mall+Mughalsarai/@25.3233219,83.0589186,13z/data=!4m10!1m2!2m1!1ssalon+neare+me!3m6!1s0x398e3be1562e0d9d:0x49f993abd85ad112!8m2!3d25.2938044!4d83.098693!15sCg1zYWxvbiBuZWFyIG1lIgOQAQFaDyINc2Fsb24gbmVhciBtZZIBDGJlYXV0eV9zYWxvbpoBJENoZERTVWhOTUc5blMwVkpRMEZuVFVSUmQwbFFiV2RCUlJBQuABAPoBBAgAEEE!16s%2Fg%2F11vlvm9lrb?entry=ttu&g_ep=EgoyMDI2MTExMC4wIKXMDSoASAFQAw%3D%3D",
+    "businessSummary": "",
+    "businessProfileJson": "",
+    "slug": "the-jawed-habib-saln-ip-mall-mughalsarai",
+    "category": "restaurant",
+    "description": "",
+    "logo": "",
+    "googleReviewUrl": "https://www.google.com/maps/place/The+Jawed+Habib+Sal%C3%B8n+IP+Mall+Mughalsarai/@25.3233219,83.0589186,13z/data=!4m10!1m2!2m1!1ssalon+neare+me!3m6!1s0x398e3be1562e0d9d:0x49f993abd85ad112!8m2!3d25.2938044!4d83.098693!15sCg1zYWxvbiBuZWFyIG1lIgOQAQFaDyINc2Fsb24gbmVhciBtZZIBDGJlYXV0eV9zYWxvbpoBJENoZERTVWhOTUc5blMwVkpRMEZuVFVSUmQwbFFiV2RCUlJBQuABAPoBBAgAEEE!16s%2Fg%2F11vlvm9lrb?entry=ttu&g_ep=EgoyMDI2MTExMC4wIKXMDSoASAFQAw%3D%3D",
+    "branding": {
+      "primaryColor": "#2563eb",
+      "secondaryColor": "#0f172a"
+    },
+    "welcomeMessage": "We value your feedback and would love to hear about your experience.",
+    "supportedLanguages": [
+      "English",
+      "Hindi",
+      "Hinglish"
+    ],
+    "reviewCategories": [
+      {
+        "name": "Staff behaviour",
+        "key": "staff",
+        "enabled": true
+      },
+      {
+        "name": "Overall experience",
+        "key": "overall",
+        "enabled": true
+      },
+      {
+        "name": "Food quality",
+        "key": "foodquality",
+        "enabled": true
+      },
+      {
+        "name": "Taste",
+        "key": "taste",
+        "enabled": true
+      },
+      {
+        "name": "Ambience",
+        "key": "ambience",
+        "enabled": true
+      },
+      {
+        "name": "Cleanliness",
+        "key": "cleanliness",
+        "enabled": true
+      },
+      {
+        "name": "Service quality",
+        "key": "service",
+        "enabled": true
+      },
+      {
+        "name": "Pricing",
+        "key": "affordability",
+        "enabled": true
+      },
+      {
+        "name": "Location",
+        "key": "location",
+        "enabled": true
+      },
+      {
+        "name": "Hygiene",
+        "key": "hygiene",
+        "enabled": true
+      },
+      {
+        "name": "Freshness",
+        "key": "freshness",
+        "enabled": true
+      },
+      {
+        "name": "Comfort",
+        "key": "comfort",
+        "enabled": true
+      }
+    ],
+    "templateSettings": {
+      "enabled": true,
+      "defaultTone": "natural"
+    },
+    "isActive": true,
+    "createdAt": "2026-11-17T13:42:13.526Z",
+    "updatedAt": "2026-11-17T13:42:13.526Z",
+    "__v": 0,
+    "id": "6afc59b57bae02089cb89b75"
+  },
+  {
     "businessName": "Raajput Restaurent",
     "contactName": "Rajpoot",
     "contactNumber": "809769598",

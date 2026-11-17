@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+const isLocalhost = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const defaultApiBaseUrl = isLocalhost ? 'http://localhost:5000/api' : (import.meta.env.VITE_API_URL || '/api');
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api'
+  baseURL: defaultApiBaseUrl
 });
 
 export const setAuthToken = (token) => {
