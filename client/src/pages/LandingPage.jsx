@@ -7,8 +7,8 @@ const features = [
     text: 'Each business gets a unique public review page with its own branding, categories, and welcome message.'
   },
   {
-    title: 'Template-based generation',
-    text: 'No paid AI dependency. Review Connect uses a deterministic sentence engine with local business templates.'
+    title: 'AI-powered generation',
+    text: 'Powered by Google Gemini with smart multi-model fallback to generate concise, authentic customer reviews in seconds.'
   },
   {
     title: 'Google review redirect',
@@ -73,7 +73,7 @@ export default function LandingPage() {
             <div className="mt-8 flex flex-wrap gap-6 text-sm text-slate-300">
               <span className="inline-flex items-center gap-2"><CheckCircle2 className="text-emerald-400" size={16} /> Business-ready</span>
               <span className="inline-flex items-center gap-2"><CheckCircle2 className="text-emerald-400" size={16} /> QR-based</span>
-              <span className="inline-flex items-center gap-2"><CheckCircle2 className="text-emerald-400" size={16} /> No AI cost</span>
+              <span className="inline-flex items-center gap-2"><CheckCircle2 className="text-emerald-400" size={16} /> Powered by Gemini AI</span>
             </div>
           </div>
 

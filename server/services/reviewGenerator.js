@@ -388,10 +388,6 @@ export function buildReviewGenerationPrompt({
 
   const summaryText = summarizeBusinessProfile(businessProfileJson, businessSummary);
   const locationText = String(businessLocation || '').trim();
-  const lengthMode = Math.random() < 0.5 ? 'short' : 'medium';
-  const lengthRule = lengthMode === 'short'
-    ? '- Keep it brief: 2 to 4 sentences with a crisp, clean ending.'
-    : '- Keep it medium-length: 4 to 6 sentences with enough detail to feel real and personal.';
 
   return [
     'Generate a customer review for the business below.',
@@ -402,16 +398,17 @@ export function buildReviewGenerationPrompt({
     `Business profile JSON: ${businessProfileJson || 'not provided'}`,
     `Tone: ${tone}`,
     `Language: ${language}`,
-    `Review length: ${lengthMode}`,
+    `Review length: short and concise`,
     `Customer experience note: ${String(description || '').trim() || 'No extra note provided.'}`,
     locationText ? `Business location: ${locationText}` : 'Business location: not provided',
-    'Requirements:',
-    '- Write in a natural, believable customer voice.',
-    '- Keep the review focused on the selected tags and the business summary.',
+    'CRITICAL REQUIREMENTS:',
+    '- MUST BE CONCISE: 1 to 2 short sentences, maximum 3 (keep it under 35-45 words).',
+    '- Write in a natural, believable customer voice as if posting on Google Maps from a phone.',
+    '- Keep the review focused on the selected tags and the customer note.',
+    '- Do not write long paragraphs, greetings, titles, bullet points, or filler.',
+    '- Do not use quotes around the review.',
     '- Do not mention AI or automation.',
-    '- Write in the requested tone and language.',
-    '- Keep it positive, credible, and realistic.',
-    lengthRule
+    `- Write in ${language}. (If Hinglish, write natural conversational Hinglish in Latin script).`
   ].join('\n');
 }
 
@@ -451,9 +448,12 @@ export function generateReview({
   if (businessLocation) {
     contextNotes.push(`I visited ${businessName} in ${businessLocation}.`);
   }
-  if (contactName) {
-    contextNotes.push(`${contactName} and the team made the visit feel warm and easy.`);
-  }
+
+  const normalizeReviewLength = (text = '') => {
+    const clean = String(text).replace(/\s+/g, ' ').trim();
+    if (clean.length <= 180) return clean;
+    return clean.slice(0, 177).trimEnd().replace(/[,;:-]?$/, '.') || clean;
+  };
 
   if (!categoryKeys.length && !description) {
     const genericClose = sentenceWithBusiness(
@@ -465,9 +465,10 @@ export function generateReview({
       businessLocation
     );
     const reviewSegments = [personalizedIntro, ...contextNotes, genericClose];
-    return uniqueText(reviewSegments).join(' ').replace(/\s+/g, ' ').trim();
+    return normalizeReviewLength(uniqueText(reviewSegments).join(' ').replace(/\s+/g, ' ').trim());
   }
 
+  const customerNote = simplifyCustomerNote(description);
   const reviewSegments = [personalizedIntro, ...contextNotes];
 
   if (categoryKeys.length) {
@@ -477,13 +478,13 @@ export function generateReview({
       return uniqueText([...basePool, ...expandedPool]);
     });
 
-    const chosenPhrases = uniqueText(pickMany(selectedPools, templateTone === 'detailed' ? 5 : 3));
+    const phraseLimit = customerNote ? 1 : (templateTone === 'detailed' ? 2 : 1);
+    const chosenPhrases = uniqueText(pickMany(selectedPools, phraseLimit));
     if (chosenPhrases.length) {
       reviewSegments.push(...chosenPhrases.map((phrase) => String(phrase).trim()));
     }
   }
 
-  const customerNote = simplifyCustomerNote(description);
   if (customerNote) {
     const noteTemplates = languageMap[lang] === 'hinglish'
       ? [
@@ -517,7 +518,7 @@ export function generateReview({
     .replace(/\s+/g, ' ')
     .trim();
 
-  return finalText;
+  return normalizeReviewLength(finalText);
 }
 
 export function getCategoryDefinitions(category = 'restaurant') {
@@ -578,11 +579,69 @@ export function getBusinessCatalog() {
 
 import OpenAI from 'openai';
 
+export async function callGeminiReviewGenerator({
+  apiKey = process.env.GEMINI_API_KEY || '',
+  prompt = '',
+  model = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest',
+  timeoutMs = 15000
+}) {
+  if (!apiKey) {
+    throw new Error('Missing Gemini API key.');
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  let response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 120 }
+      }),
+      signal: controller.signal
+    });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`Gemini request timed out after ${timeoutMs}ms.`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Gemini request failed (${response.status}): ${errorBody.slice(0, 300)}`);
+  }
+
+  const data = await response.json();
+  const rawContent = data?.candidates?.[0]?.content?.parts
+    ?.map((part) => (typeof part?.text === 'string' ? part.text : ''))
+    .join('')
+    .trim();
+
+  const content = rawContent ? rawContent.replace(/^["'“”]+|["'“”]+$/g, '').trim() : '';
+
+  if (!content) {
+    throw new Error('Gemini returned no usable completion content.');
+  }
+
+  return content;
+}
+
 export async function callXaiReviewGenerator({
   apiKey = '',
   prompt = '',
-  model = process.env.LLM_MODEL || process.env.SENSENOVA_MODEL || process.env.SENSONOVA_MODEL || process.env.GROQ_MODEL || 'sensenova-v6-8-flash-lite',
-  baseUrl = process.env.LLM_BASE_URL || process.env.SENSENOVA_BASE_URL || process.env.SENSONOVA_BASE_URL || process.env.GROQ_BASE_URL || 'https://token.sensenova.ai/v1'
+  model = process.env.SENSENOVA_MODEL || process.env.LLM_MODEL || process.env.SENSONOVA_MODEL || process.env.GROQ_MODEL || 'sensenova-6.8-flash-lite',
+  baseUrl = process.env.LLM_BASE_URL || process.env.SENSENOVA_BASE_URL || process.env.SENSONOVA_BASE_URL || process.env.GROQ_BASE_URL || 'https://token.sensenova.ai/v1',
+  timeoutMs = 15000
 }) {
   if (!apiKey) {
     throw new Error('Missing LLM API key.');
@@ -593,27 +652,26 @@ export async function callXaiReviewGenerator({
   const client = new OpenAI({
     apiKey,
     baseURL: baseUrl,
+    timeout: timeoutMs,
     dangerouslyAllowBrowser: false
   });
 
   const response = await client.chat.completions.create({
     model,
     messages: [{ role: 'user', content: prompt }],
-    temperature: 0.8,
-    max_tokens: 400
+    temperature: 0.7,
+    max_tokens: 120
   });
 
-  const content = response?.choices?.[0]?.message?.content;
-  if (typeof content === 'string' && content.trim()) {
-    return content.trim();
+  const raw = response?.choices?.[0]?.message?.content;
+  let content = '';
+  if (typeof raw === 'string' && raw.trim()) {
+    content = raw.trim();
+  } else if (Array.isArray(raw)) {
+    content = raw.map((part) => typeof part?.text === 'string' ? part.text : '').join('').trim();
   }
 
-  if (Array.isArray(content)) {
-    const text = content.map((part) => typeof part?.text === 'string' ? part.text : '').join('').trim();
-    if (text) {
-      return text;
-    }
-  }
+  content = content.replace(/^["'“”]+|["'“”]+$/g, '').trim();
 
   throw new Error('LLM returned no usable completion content.');
 }
@@ -629,51 +687,69 @@ export async function generateReviewWithFallback({
   businessProfileJson = '',
   businessLocation = '',
   llmApiKey = '',
+  geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '',
+  senseNovaApiKey = process.env.SENSENOVA_API_KEY || process.env.SENSONOVA_API_KEY || '',
   llmRequest = null
 }) {
-  const normalized = normalizeReviewInput({
-    businessName,
-    businessCategory,
-    selectedCategories,
-    tone,
-    language,
-    description,
-    businessLocation
+  const normalized = normalizeReviewInput({ businessName, businessCategory, selectedCategories, tone, language, description, businessLocation });
+  const prompt = buildReviewGenerationPrompt({
+    businessName: normalized.businessName,
+    businessCategory: normalized.businessCategory,
+    selectedCategories: normalized.selectedCategories,
+    description: normalized.description,
+    tone: normalized.tone,
+    language: normalized.language,
+    businessSummary,
+    businessProfileJson,
+    businessLocation: normalized.businessLocation
   });
 
-  if (llmApiKey) {
+  if (typeof llmRequest === 'function') {
     try {
-      const requestFn = typeof llmRequest === 'function' ? llmRequest : callXaiReviewGenerator;
-      const prompt = buildReviewGenerationPrompt({
-        businessName: normalized.businessName,
-        businessCategory: normalized.businessCategory,
-        selectedCategories: normalized.selectedCategories,
-        description: normalized.description,
-        tone: normalized.tone,
-        language: normalized.language,
-        businessSummary,
-        businessProfileJson,
-        businessLocation: normalized.businessLocation
-      });
-
-      const response = await requestFn({
-        model: process.env.LLM_MODEL || process.env.SENSENOVA_MODEL || process.env.SENSONOVA_MODEL || process.env.GROQ_MODEL || 'sensenova-v6-8-flash-lite',
-        apiKey: llmApiKey,
-        prompt,
-        baseUrl: process.env.LLM_BASE_URL || process.env.SENSENOVA_BASE_URL || process.env.SENSONOVA_BASE_URL || process.env.GROQ_BASE_URL || 'https://token.sensenova.ai/v1'
-      });
-
+      const timeoutMs = 20000;
+      const response = await Promise.race([
+        llmRequest({
+          model: process.env.LLM_MODEL || process.env.SENSENOVA_MODEL || 'sensenova-6.8-flash-lite',
+          apiKey: llmApiKey || geminiApiKey || senseNovaApiKey,
+          prompt,
+          baseUrl: process.env.LLM_BASE_URL || 'https://token.sensenova.ai/v1'
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('LLM request timed out after 20 seconds')), timeoutMs))
+      ]);
       const text = String(response || '').trim();
-      if (text) {
-        return text;
-      }
+      if (text) return text;
     } catch (error) {
-      console.warn('[LLM] request failed, falling back to local generator:', error?.message || error);
+      console.warn('[LLM] custom request failed:', error?.message || error);
     }
-  }
+  } else {
+    // Primary: Gemini
+    if (geminiApiKey) {
+      try {
+        console.info('[LLM] Trying primary Gemini provider');
+        const text = String(await callGeminiReviewGenerator({ apiKey: geminiApiKey, prompt })).trim();
+        if (text) return text;
+      } catch (error) {
+        console.warn('[LLM] Gemini primary failed, falling back to SenseNova:', error?.message || error);
+      }
+    }
 
-  if (!llmApiKey) {
-    console.warn('[LLM] No API key configured. Using local review generator instead.');
+    // Secondary: SenseNova
+    if (senseNovaApiKey) {
+      try {
+        console.info('[LLM] Trying secondary SenseNova provider');
+        const text = String(await callXaiReviewGenerator({
+          apiKey: senseNovaApiKey,
+          prompt,
+          model: process.env.SENSENOVA_MODEL || process.env.LLM_MODEL || 'sensenova-6.8-flash-lite',
+          baseUrl: process.env.LLM_BASE_URL || process.env.SENSENOVA_BASE_URL || 'https://token.sensenova.ai/v1'
+        })).trim();
+        if (text) return text;
+      } catch (error) {
+        console.warn('[LLM] SenseNova secondary failed, falling back to local generator:', error?.message || error);
+      }
+    } else {
+      console.warn('[LLM] No SenseNova provider key available. Using local review generator instead.');
+    }
   }
 
   return generateReview({

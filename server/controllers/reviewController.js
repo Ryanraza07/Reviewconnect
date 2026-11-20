@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { generateReviewWithFallback, normalizeReviewInput } from '../services/reviewGenerator.js';
-import { getBusinessStore, getAnalyticsStore } from '../data/demoBusinesses.js';
+import { getBusinessStore, getAnalyticsStore, loadBusinessesFromDb } from '../data/demoBusinesses.js';
 
-const resolveLlmApiKey = () => process.env.GROQ_API_KEY || process.env.SENSENOVA_API_KEY || process.env.SENSONOVA_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY || process.env.OPENAI_API_KEY || '';
+const resolveGeminiApiKey = () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+const resolveSenseNovaApiKey = () => process.env.SENSENOVA_API_KEY || process.env.SENSONOVA_API_KEY || process.env.GROQ_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY || process.env.OPENAI_API_KEY || '';
 
 const reviewPayload = z.object({
   businessSlug: z.string().min(2).max(80),
@@ -23,7 +24,7 @@ export const generateReviewForBusiness = async (req, res) => {
   }
 
   const { businessSlug, selectedCategories, description, businessSummary, businessProfileJson, tone, language, rating } = parsed.data;
-  const business = getBusinessStore().find((item) => item.slug === businessSlug);
+  const business = (await loadBusinessesFromDb()).find((item) => item.slug === businessSlug) || getBusinessStore().find((item) => item.slug === businessSlug);
 
   if (!business) {
     return res.status(404).json({ message: 'Business not found.' });
@@ -61,7 +62,8 @@ export const generateReviewForBusiness = async (req, res) => {
     businessLocation: normalized.businessLocation,
     businessSummary: effectiveSummary,
     businessProfileJson: effectiveProfileJson,
-    llmApiKey: resolveLlmApiKey()
+    geminiApiKey: resolveGeminiApiKey(),
+    senseNovaApiKey: resolveSenseNovaApiKey()
   });
 
   const analytics = getAnalyticsStore();
