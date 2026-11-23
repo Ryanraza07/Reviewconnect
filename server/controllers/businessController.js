@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { getBusinessStore, loadBusinessesFromDb, persistBusinessStore } from '../data/demoBusinesses.js';
 import Business from '../models/Business.js';
 import { getDefaultReviewCategories } from '../services/reviewGenerator.js';
+import { generateAdvanceReview, getAndConsumePregeneratedReview } from '../services/pregeneratedReviewService.js';
 
 const slugify = (value = '') =>
   value
@@ -59,7 +60,19 @@ export const getBusinessBySlug = async (req, res) => {
     return res.status(404).json({ message: 'Business not found.' });
   }
 
-  return res.json(business);
+  let pregeneratedReview = getAndConsumePregeneratedReview(business);
+  if (!pregeneratedReview) {
+    try {
+      pregeneratedReview = await generateAdvanceReview(business);
+    } catch {
+      pregeneratedReview = null;
+    }
+  }
+
+  return res.json({
+    ...business,
+    pregeneratedReview
+  });
 };
 
 export const createBusiness = async (req, res) => {

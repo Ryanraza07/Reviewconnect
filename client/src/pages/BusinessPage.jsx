@@ -12,11 +12,12 @@ import {
   Quote,
   PencilLine,
   ThumbsUp,
-  User
+  User,
+  Navigation
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../services/api';
-import { buildBusinessLocationHref } from '../utils/location';
+import { buildBusinessLocationHref, buildDirectionsHref } from '../utils/location';
 
 const tones = [
   { key: 'simple', label: 'Short', emoji: '⚡' },
@@ -71,20 +72,32 @@ export default function BusinessPage() {
           : 'Hinglish';
         setLanguage(preferredLanguage);
 
-        if (defaults.length) {
-          try {
-            const { data: preview } = await api.post('/reviews/generate', {
-              businessSlug: data.slug,
-              selectedCategories: defaults,
-              tone: data.templateSettings?.defaultTone || 'natural',
-              language: preferredLanguage,
-              rating: 5,
-              description: 'Great quality, polite team, and wonderful experience.'
-            });
-            setReviewText(preview.review);
-          } catch {
-            setReviewText('Had a wonderful visit! Great quality, polite staff, and pleasant experience all around.');
+        // Instant pregenerated review from server (zero wait time for customer!)
+        if (data.pregeneratedReview?.review) {
+          setReviewText(data.pregeneratedReview.review);
+          if (data.pregeneratedReview.selectedCategories?.length) {
+            setSelectedCategories(data.pregeneratedReview.selectedCategories);
           }
+          if (data.pregeneratedReview.tone) {
+            setTone(data.pregeneratedReview.tone);
+          }
+          if (data.pregeneratedReview.language) {
+            setLanguage(data.pregeneratedReview.language);
+          }
+        } else if (defaults.length) {
+          // If no advance review in buffer yet, trigger on-demand AI review generation
+          api.post('/reviews/generate', {
+            businessSlug: slug,
+            selectedCategories: defaults,
+            tone: data.templateSettings?.defaultTone || 'natural',
+            language: preferredLanguage,
+            rating: 5,
+            description: ''
+          }).then((res) => {
+            if (res.data?.review) {
+              setReviewText(res.data.review);
+            }
+          }).catch(() => {});
         }
       } catch (error) {
         toast.error('Business not found.');
@@ -565,36 +578,86 @@ export default function BusinessPage() {
 
         </div>
 
-        {/* Location & Map Preview - Wide and prominent */}
+        {/* Location & Navigation Card - Fast, zero-blocking, mobile-optimized */}
         {business.location && (
           <section className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Visit Us</span>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">{business.businessName}</h3>
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">
+                  <MapPin size={12} className="text-blue-600" />
+                  Google Maps Location
+                </div>
+                <h3 className="mt-1 text-base sm:text-lg font-bold text-slate-900">{business.businessName}</h3>
                 <p className="mt-0.5 flex items-center gap-1.5 text-xs sm:text-sm text-slate-600">
-                  <MapPin size={15} className="shrink-0 text-red-500" />
-                  {business.location}
+                  <span className="font-medium text-slate-800">{business.location}</span>
                 </p>
               </div>
-              <a
-                href={buildBusinessLocationHref(business.location, business.locationLink)}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 transition hover:bg-slate-100 shrink-0"
-              >
-                <ExternalLink size={14} /> Open in Google Maps
-              </a>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href={buildDirectionsHref(business.location, business.locationLink)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.98]"
+                >
+                  <Navigation size={14} /> Get Directions
+                </a>
+                <a
+                  href={buildBusinessLocationHref(business.location, business.locationLink)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+                >
+                  <ExternalLink size={14} /> Open in Maps
+                </a>
+                {business.contactNumber && (
+                  <a
+                    href={`tel:${String(business.contactNumber).replace(/[^\d+]/g, '')}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+                  >
+                    <Phone size={14} className="text-emerald-600" /> Call
+                  </a>
+                )}
+              </div>
             </div>
 
-            <div className="mt-4 h-48 sm:h-64 md:h-72 w-full overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
-              <iframe
-                title="Business location map"
-                src={`https://www.google.com/maps?q=${encodeURIComponent(business.location)}&z=14&output=embed`}
-                className="h-full w-full border-0"
-                loading="lazy"
+            {/* Stylized Interactive Map Preview banner */}
+            <a
+              href={buildBusinessLocationHref(business.location, business.locationLink)}
+              target="_blank"
+              rel="noreferrer"
+              className="group relative mt-4 block overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-100 via-blue-50/40 to-slate-200/70 p-6 sm:p-8 transition hover:border-blue-300 hover:shadow-md"
+            >
+              {/* Subtle background street grid lines */}
+              <div
+                className="pointer-events-none absolute inset-0 opacity-40"
+                style={{
+                  backgroundImage:
+                    'radial-gradient(circle, #94a3b8 1px, transparent 1px), linear-gradient(to right, #cbd5e1 1px, transparent 1px), linear-gradient(to bottom, #cbd5e1 1px, transparent 1px)',
+                  backgroundSize: '24px 24px, 48px 48px, 48px 48px'
+                }}
               />
-            </div>
+
+              <div className="relative z-10 flex flex-col items-center justify-center text-center">
+                {/* Pulsing Pin Marker */}
+                <div className="relative mb-3 flex items-center justify-center">
+                  <span className="absolute h-12 w-12 animate-ping rounded-full bg-red-400 opacity-30" />
+                  <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-lg shadow-red-500/30">
+                    <MapPin size={24} className="drop-shadow" />
+                  </div>
+                </div>
+
+                <div className="max-w-md rounded-xl border border-white/80 bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur-sm">
+                  <p className="text-xs sm:text-sm font-bold text-slate-900">{business.businessName}</p>
+                  <p className="text-[11px] sm:text-xs text-slate-600 line-clamp-1">{business.location}</p>
+                </div>
+
+                <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 group-hover:underline">
+                  <span>Tap to view live location & navigation on Google Maps</span>
+                  <ExternalLink size={13} />
+                </div>
+              </div>
+            </a>
           </section>
         )}
       </main>

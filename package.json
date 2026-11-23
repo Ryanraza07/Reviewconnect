@@ -9,7 +9,6 @@
     "client": "cd client && npm run dev -- --host 0.0.0.0",
     "build": "cd client && npm run build",
     "start": "npm run build && node server/index.js",
-    "seed": "node server/scripts/seedTemplates.js",
     "test": "node --test server/tests/*.test.js"
   },
   "dependencies": {

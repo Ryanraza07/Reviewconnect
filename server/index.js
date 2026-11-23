@@ -13,6 +13,7 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { getAnalyticsStore } from './data/demoBusinesses.js';
+import { warmupPregeneratedReviews } from './services/pregeneratedReviewService.js';
 
 const rootEnvPath = fileURLToPath(new URL('../.env', import.meta.url));
 const serverEnvPath = fileURLToPath(new URL('./.env', import.meta.url));
@@ -75,6 +76,7 @@ if (fs.existsSync(clientDistPath)) {
 app.use(errorHandler);
 
 connectDB().then(() => {
+  warmupPregeneratedReviews();
   app.listen(port, () => {
     console.log(`Review Connect API running on http://localhost:${port}`);
   });

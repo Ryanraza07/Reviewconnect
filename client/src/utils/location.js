@@ -12,3 +12,19 @@ export const buildBusinessLocationHref = (location = '', locationLink = '') => {
 
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(trimmedLocation)}`;
 };
+
+export const buildDirectionsHref = (location = '', locationLink = '') => {
+  const trimmedLocation = String(location || '').trim();
+  const trimmedLink = String(locationLink || '').trim();
+
+  if (trimmedLocation) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(trimmedLocation)}`;
+  }
+
+  if (trimmedLink) {
+    return /^https?:\/\//i.test(trimmedLink) ? trimmedLink : `https://${trimmedLink}`;
+  }
+
+  return '#';
+};
+
