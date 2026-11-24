@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BarChart3, Building2, LogOut, MapPin, Phone, QrCode, ShieldCheck, Trash2 } from 'lucide-react';
+import { BarChart3, Building2, Globe, Instagram, LogOut, Mail, MapPin, MessageCircle, Phone, QrCode, ShieldCheck, Trash2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import api, { setAuthToken } from '../services/api';
 import { buildBusinessLocationHref } from '../utils/location';
@@ -9,6 +9,7 @@ const defaultForm = {
   category: 'restaurant',
   contactName: '',
   contactPhone: '',
+  email: '',
   location: '',
   locationLink: '',
   businessSummary: '',
@@ -16,7 +17,14 @@ const defaultForm = {
   googleReviewUrl: '',
   welcomeMessage: 'We value your feedback and would love to hear about your experience.',
   primaryColor: '#2563eb',
-  logo: ''
+  logo: '',
+  website: '',
+  instagram: '',
+  facebook: '',
+  whatsapp: '',
+  twitter: '',
+  youtube: '',
+  linkedin: ''
 };
 
 const defaultReviewCategoriesByType = {
@@ -61,6 +69,118 @@ const defaultReviewCategoriesByType = {
     { key: 'comfort', name: 'Comfort' },
     { key: 'waiting', name: 'Waiting time' },
     { key: 'accessibility', name: 'Accessibility' }
+  ],
+  general_store: [
+    { key: 'staff', name: 'Staff behaviour' },
+    { key: 'overall', name: 'Overall experience' },
+    { key: 'variety', name: 'Product variety & stock' },
+    { key: 'affordability', name: 'Pricing & value' },
+    { key: 'billing', name: 'Billing speed & checkout' },
+    { key: 'freshness', name: 'Freshness of items' },
+    { key: 'cleanliness', name: 'Store cleanliness' },
+    { key: 'service', name: 'Customer assistance' },
+    { key: 'location', name: 'Location & accessibility' },
+    { key: 'discounts', name: 'Offers & discounts' },
+    { key: 'organization', name: 'Ease of finding items' },
+    { key: 'digitalpayment', name: 'Payment convenience' }
+  ],
+  optical: [
+    { key: 'staff', name: 'Staff behaviour' },
+    { key: 'overall', name: 'Overall experience' },
+    { key: 'eyetest', name: 'Eye testing accuracy' },
+    { key: 'frames', name: 'Frame collection & variety' },
+    { key: 'lenses', name: 'Lens quality & clarity' },
+    { key: 'affordability', name: 'Pricing & value' },
+    { key: 'delivery', name: 'On-time delivery' },
+    { key: 'fitting', name: 'Frame fitting & comfort' },
+    { key: 'cleanliness', name: 'Store cleanliness' },
+    { key: 'service', name: 'Customer service' },
+    { key: 'consultation', name: 'Optometrist guidance' },
+    { key: 'warranty', name: 'After-sales & warranty' }
+  ],
+  pharmacy: [
+    { key: 'staff', name: 'Pharmacist behaviour' },
+    { key: 'overall', name: 'Overall experience' },
+    { key: 'availability', name: 'Medicine availability' },
+    { key: 'billing', name: 'Quick billing & packing' },
+    { key: 'affordability', name: 'Genuine rates & discounts' },
+    { key: 'cleanliness', name: 'Store hygiene & storage' },
+    { key: 'guidance', name: 'Prescription guidance' },
+    { key: 'delivery', name: 'Home delivery service' },
+    { key: 'digitalpayment', name: 'Payment options' },
+    { key: 'location', name: 'Location convenience' },
+    { key: 'genuineness', name: 'Genuine medicines' },
+    { key: 'emergency', name: 'Prompt assistance' }
+  ],
+  electronics: [
+    { key: 'staff', name: 'Staff behaviour' },
+    { key: 'overall', name: 'Overall experience' },
+    { key: 'product_range', name: 'Gadget variety & stock' },
+    { key: 'genuineness', name: '100% genuine products' },
+    { key: 'affordability', name: 'Best pricing & deals' },
+    { key: 'demo', name: 'Product demo & guidance' },
+    { key: 'service', name: 'Customer service' },
+    { key: 'billing', name: 'Quick billing & invoice' },
+    { key: 'warranty', name: 'Warranty & guarantee' },
+    { key: 'payment', name: 'EMI & payment options' },
+    { key: 'ambience', name: 'Store display & ambience' },
+    { key: 'aftersales', name: 'After-sales support' }
+  ],
+  fashion: [
+    { key: 'staff', name: 'Staff assistance' },
+    { key: 'overall', name: 'Overall experience' },
+    { key: 'collection', name: 'Latest design collection' },
+    { key: 'fabric', name: 'Fabric & stitching quality' },
+    { key: 'fitting', name: 'Trial room & fitting' },
+    { key: 'affordability', name: 'Reasonable pricing' },
+    { key: 'variety', name: 'Color & size variety' },
+    { key: 'ambience', name: 'Showroom ambience' },
+    { key: 'billing', name: 'Smooth billing' },
+    { key: 'alteration', name: 'Alteration service' },
+    { key: 'discounts', name: 'Seasonal discounts' },
+    { key: 'cleanliness', name: 'Store neatness' }
+  ],
+  gym: [
+    { key: 'staff', name: 'Staff & trainer behaviour' },
+    { key: 'overall', name: 'Overall experience' },
+    { key: 'equipment', name: 'Modern workout machines' },
+    { key: 'cleanliness', name: 'Hygiene & sanitization' },
+    { key: 'trainers', name: 'Certified trainer guidance' },
+    { key: 'ambience', name: 'Music & workout vibe' },
+    { key: 'affordability', name: 'Membership pricing' },
+    { key: 'space', name: 'Spacious workout floor' },
+    { key: 'ventilation', name: 'AC & ventilation' },
+    { key: 'crowd', name: 'Crowd management' },
+    { key: 'facilities', name: 'Lockers & changing rooms' },
+    { key: 'timings', name: 'Flexible operating hours' }
+  ],
+  automobile: [
+    { key: 'staff', name: 'Mechanic behaviour' },
+    { key: 'overall', name: 'Overall experience' },
+    { key: 'expertise', name: 'Mechanical expertise' },
+    { key: 'turnaround', name: 'Turnaround time' },
+    { key: 'transparency', name: 'Transparent cost estimate' },
+    { key: 'affordability', name: 'Reasonable repair charges' },
+    { key: 'genuine_parts', name: 'Genuine spare parts' },
+    { key: 'cleanliness', name: 'Washing & cleanup' },
+    { key: 'service', name: 'Service quality' },
+    { key: 'pickup_drop', name: 'Pickup & drop facility' },
+    { key: 'diagnostics', name: 'Accurate problem diagnosis' },
+    { key: 'updates', name: 'Timely status updates' }
+  ],
+  hotel: [
+    { key: 'staff', name: 'Staff hospitality' },
+    { key: 'overall', name: 'Overall stay experience' },
+    { key: 'rooms', name: 'Room cleanliness & comfort' },
+    { key: 'bedding', name: 'Bedding & linen quality' },
+    { key: 'bathroom', name: 'Clean bathrooms & hot water' },
+    { key: 'checkin', name: 'Fast check-in & check-out' },
+    { key: 'food', name: 'Room service & breakfast' },
+    { key: 'location', name: 'Location & accessibility' },
+    { key: 'affordability', name: 'Value for money' },
+    { key: 'wifi', name: 'High-speed Wi-Fi & AC' },
+    { key: 'parking', name: 'Safe parking facility' },
+    { key: 'safety', name: 'Security & peaceful stay' }
   ]
 };
 
@@ -137,6 +257,16 @@ export default function AdminPage() {
       const payload = {
         ...form,
         contactNumber: form.contactPhone,
+        email: form.email,
+        socialLinks: {
+          website: form.website || '',
+          instagram: form.instagram || '',
+          facebook: form.facebook || '',
+          whatsapp: form.whatsapp || '',
+          twitter: form.twitter || '',
+          youtube: form.youtube || '',
+          linkedin: form.linkedin || ''
+        },
         reviewCategories: buildDefaultReviewCategories(form.category),
         supportedLanguages: ['English', 'Hindi', 'Hinglish'],
         templateSettings: { enabled: true, defaultTone: 'natural' },
@@ -186,6 +316,7 @@ export default function AdminPage() {
       category: business.category || 'restaurant',
       contactName: business.contactName || '',
       contactPhone: business.contactNumber || '',
+      email: business.email || '',
       location: business.location || '',
       locationLink: business.locationLink || '',
       businessSummary: business.businessSummary || '',
@@ -193,7 +324,14 @@ export default function AdminPage() {
       googleReviewUrl: business.googleReviewUrl || '',
       welcomeMessage: business.welcomeMessage || 'We value your feedback and would love to hear about your experience.',
       primaryColor: business.branding?.primaryColor || '#2563eb',
-      logo: business.logo || ''
+      logo: business.logo || '',
+      website: business.socialLinks?.website || '',
+      instagram: business.socialLinks?.instagram || '',
+      facebook: business.socialLinks?.facebook || '',
+      whatsapp: business.socialLinks?.whatsapp || '',
+      twitter: business.socialLinks?.twitter || '',
+      youtube: business.socialLinks?.youtube || '',
+      linkedin: business.socialLinks?.linkedin || ''
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -323,9 +461,17 @@ export default function AdminPage() {
                   <div>
                     <label className="mb-1 block text-[12px] font-medium text-slate-600">Category</label>
                     <select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/10">
-                      <option value="restaurant">Restaurant</option>
-                      <option value="salon">Salon</option>
-                      <option value="clinic">Clinic</option>
+                      <option value="restaurant">Restaurant & Café</option>
+                      <option value="salon">Salon & Spa</option>
+                      <option value="clinic">Clinic & Healthcare</option>
+                      <option value="general_store">General Store & Supermarket</option>
+                      <option value="optical">Optical Shop & Eyewear</option>
+                      <option value="pharmacy">Pharmacy & Medical Store</option>
+                      <option value="electronics">Electronics & Mobile Store</option>
+                      <option value="fashion">Fashion & Clothing Boutique</option>
+                      <option value="gym">Gym & Fitness Center</option>
+                      <option value="automobile">Automobile & Garage Service</option>
+                      <option value="hotel">Hotel & Hospitality</option>
                     </select>
                   </div>
                 </div>
@@ -336,8 +482,51 @@ export default function AdminPage() {
                     <input value={form.contactName} onChange={(event) => setForm({ ...form, contactName: event.target.value })} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/10" placeholder="Aisha Khan" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-[12px] font-medium text-slate-600">Contact number</label>
+                    <label className="mb-1 block text-[12px] font-medium text-slate-600">Contact phone / WhatsApp</label>
                     <input value={form.contactPhone} onChange={(event) => setForm({ ...form, contactPhone: event.target.value })} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/10" placeholder="+91 98765 43210" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-[12px] font-medium text-slate-600">Business email</label>
+                  <input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/10" placeholder="hello@yourbusiness.com" />
+                </div>
+
+                {/* Social Media Handles & Links Onboarding */}
+                <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 space-y-2.5">
+                  <div className="flex items-center gap-2 pb-1 border-b border-slate-200/60">
+                    <Globe size={15} className="text-blue-600" />
+                    <span className="text-[12px] font-semibold text-slate-800 uppercase tracking-wider">Social Media Handles & Links</span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-600">Website URL</label>
+                      <input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} placeholder="https://yourbusiness.com" className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-blue-400" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-600">Instagram (@handle or URL)</label>
+                      <input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@yourbusiness or https://instagram.com/..." className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-blue-400" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-600">WhatsApp (Number or Link)</label>
+                      <input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} placeholder="+91 98765 43210" className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-blue-400" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-600">Facebook (Page URL)</label>
+                      <input value={form.facebook} onChange={(e) => setForm({ ...form, facebook: e.target.value })} placeholder="https://facebook.com/yourbusiness" className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-blue-400" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-600">Twitter / X (@handle or URL)</label>
+                      <input value={form.twitter} onChange={(e) => setForm({ ...form, twitter: e.target.value })} placeholder="@yourbusiness or https://x.com/..." className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-blue-400" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-slate-600">YouTube (Channel URL)</label>
+                      <input value={form.youtube} onChange={(e) => setForm({ ...form, youtube: e.target.value })} placeholder="https://youtube.com/@yourbusiness" className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-blue-400" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-[11px] font-medium text-slate-600">LinkedIn (Profile/Company URL)</label>
+                      <input value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} placeholder="https://linkedin.com/company/yourbusiness" className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-blue-400" />
+                    </div>
                   </div>
                 </div>
 
@@ -440,6 +629,11 @@ export default function AdminPage() {
                         <Phone size={11} /> {business.contactNumber}
                       </a>
                     ) : null}
+                    {business.email ? (
+                      <a href={`mailto:${business.email}`} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 transition hover:bg-slate-200">
+                        <Mail size={11} /> {business.email}
+                      </a>
+                    ) : null}
                     {business.location ? (
                       <a
                         href={buildBusinessLocationHref(business.location, business.locationLink)}
@@ -448,6 +642,21 @@ export default function AdminPage() {
                         className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 transition hover:bg-slate-200"
                       >
                         <MapPin size={11} /> {business.location}
+                      </a>
+                    ) : null}
+                    {business.socialLinks?.website ? (
+                      <a href={business.socialLinks.website.startsWith('http') ? business.socialLinks.website : `https://${business.socialLinks.website}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-full bg-blue-50 text-blue-700 px-2 py-1 transition hover:bg-blue-100">
+                        <Globe size={11} /> Website
+                      </a>
+                    ) : null}
+                    {business.socialLinks?.instagram ? (
+                      <a href={business.socialLinks.instagram.startsWith('http') ? business.socialLinks.instagram : `https://instagram.com/${business.socialLinks.instagram.replace(/^@/, '')}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-full bg-pink-50 text-pink-700 px-2 py-1 transition hover:bg-pink-100">
+                        <Instagram size={11} /> Instagram
+                      </a>
+                    ) : null}
+                    {business.socialLinks?.whatsapp ? (
+                      <a href={`https://wa.me/${String(business.socialLinks.whatsapp).replace(/[^\d]/g, '')}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2 py-1 transition hover:bg-emerald-100">
+                        <MessageCircle size={11} /> WhatsApp
                       </a>
                     ) : null}
                   </div>

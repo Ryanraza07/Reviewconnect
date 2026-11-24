@@ -91,10 +91,9 @@ export async function generateAdvanceReview(business) {
 
   try {
     const selectedCategories = pickRandomCategories(business);
-    const tone = business.templateSettings?.defaultTone || 'natural';
-    const preferredLanguage = business.supportedLanguages?.length
-      ? (business.supportedLanguages.includes('Hinglish') ? 'Hinglish' : business.supportedLanguages[0])
-      : 'Hinglish';
+    const tone = 'random';
+    const langPool = ['English', 'Hinglish'];
+    const preferredLanguage = langPool[Math.floor(Math.random() * langPool.length)];
 
     const reviewText = await generateReviewWithFallback({
       businessName: business.businessName,

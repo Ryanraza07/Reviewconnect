@@ -17,12 +17,37 @@ const businessSchema = z.object({
   businessName: z.string().min(2).max(120),
   contactName: z.string().max(120).optional().default(''),
   contactNumber: z.string().max(40).optional().default(''),
+  email: z.string().max(120).optional().default(''),
+  socialLinks: z
+    .object({
+      website: z.string().optional().default(''),
+      instagram: z.string().optional().default(''),
+      facebook: z.string().optional().default(''),
+      whatsapp: z.string().optional().default(''),
+      twitter: z.string().optional().default(''),
+      youtube: z.string().optional().default(''),
+      linkedin: z.string().optional().default('')
+    })
+    .optional()
+    .default({}),
   location: z.string().max(200).optional().default(''),
   locationLink: z.string().url().optional().or(z.literal('')).default(''),
   businessSummary: z.string().max(800).optional().default(''),
   businessProfileJson: z.string().max(8000).optional().default(''),
   slug: z.string().min(2).max(80).optional(),
-  category: z.enum(['restaurant', 'salon', 'clinic']).default('restaurant'),
+  category: z.enum([
+    'restaurant',
+    'salon',
+    'clinic',
+    'general_store',
+    'optical',
+    'pharmacy',
+    'electronics',
+    'fashion',
+    'gym',
+    'automobile',
+    'hotel'
+  ]).default('restaurant'),
   description: z.string().max(500).optional().default(''),
   logo: z
     .string()

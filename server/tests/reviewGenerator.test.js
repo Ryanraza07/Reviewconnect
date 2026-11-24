@@ -122,12 +122,54 @@ test('generateReview throws explicit error that local generation has been remove
   );
 });
 
-test('tag catalogs exist across restaurant, salon, and clinic categories', () => {
-  const restaurantTags = getDefaultReviewCategories('restaurant');
-  const salonTags = getDefaultReviewCategories('salon');
-  const clinicTags = getDefaultReviewCategories('clinic');
+test('tag catalogs exist across all business categories including general store and optical', () => {
+  const allCategories = [
+    'restaurant',
+    'salon',
+    'clinic',
+    'general_store',
+    'optical',
+    'pharmacy',
+    'electronics',
+    'fashion',
+    'gym',
+    'automobile',
+    'hotel'
+  ];
 
-  assert.ok(restaurantTags.length >= 10);
-  assert.ok(salonTags.length >= 10);
-  assert.ok(clinicTags.length >= 10);
+  for (const cat of allCategories) {
+    const tags = getDefaultReviewCategories(cat);
+    assert.ok(tags.length >= 10, `Expected at least 10 tags for ${cat}, got ${tags.length}`);
+  }
+
+  const generalStoreTags = getDefaultReviewCategories('general_store');
+  assert.ok(generalStoreTags.some((item) => item.key === 'variety' && item.name.includes('variety')));
+  assert.ok(generalStoreTags.some((item) => item.key === 'billing' && item.name.includes('Billing')));
+
+  const opticalTags = getDefaultReviewCategories('optical');
+  assert.ok(opticalTags.some((item) => item.key === 'eyetest' && item.name.includes('Eye testing')));
+  assert.ok(opticalTags.some((item) => item.key === 'frames' && item.name.includes('Frame collection')));
+  assert.ok(opticalTags.some((item) => item.key === 'lenses' && item.name.includes('Lens quality')));
+});
+
+test('builds prompt for general store and optical shop categories with custom hints', () => {
+  const opticalPrompt = buildReviewGenerationPrompt({
+    businessName: 'Vision Care Opticals',
+    businessCategory: 'optical',
+    selectedCategories: ['eyetest', 'frames'],
+    language: 'English'
+  });
+  assert.match(opticalPrompt, /Vision Care Opticals/i);
+  assert.match(opticalPrompt, /optical/i);
+  assert.match(opticalPrompt, /accurate eye test/i);
+
+  const generalStorePrompt = buildReviewGenerationPrompt({
+    businessName: 'Prime Daily Mart',
+    businessCategory: 'general_store',
+    selectedCategories: ['variety', 'billing'],
+    language: 'Hinglish'
+  });
+  assert.match(generalStorePrompt, /Prime Daily Mart/i);
+  assert.match(generalStorePrompt, /general_store/i);
+  assert.match(generalStorePrompt, /fresh grocery stock/i);
 });

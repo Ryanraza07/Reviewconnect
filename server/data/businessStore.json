@@ -90,8 +90,18 @@
     },
     "isActive": true,
     "createdAt": "2026-11-21T07:43:19.678Z",
-    "updatedAt": "2026-11-21T07:46:28.926Z",
+    "updatedAt": "2026-11-24T05:25:15.510Z",
     "__v": 0,
+    "email": "",
+    "socialLinks": {
+      "website": "",
+      "instagram": "@devmainss",
+      "facebook": "ghjlkhjgghjk",
+      "whatsapp": "76354748474",
+      "twitter": "jhggngbv",
+      "youtube": "yjhtgfhtgr",
+      "linkedin": "yjhghmnb"
+    },
     "id": "6b014b9721c757b39732ead2"
   },
   {

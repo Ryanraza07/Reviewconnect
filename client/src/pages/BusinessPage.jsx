@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Copy,
@@ -6,31 +6,79 @@ import {
   ExternalLink,
   MapPin,
   Phone,
+  Mail,
+  Globe,
+  Instagram,
+  Facebook,
+  MessageCircle,
+  Twitter,
+  Youtube,
+  Linkedin,
   Sparkles,
   Star,
   RefreshCw,
-  Quote,
   PencilLine,
-  ThumbsUp,
-  User,
-  Navigation
+  Navigation,
+  ShieldCheck,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../services/api';
 import { buildBusinessLocationHref, buildDirectionsHref } from '../utils/location';
 
-const tones = [
-  { key: 'simple', label: 'Short', emoji: '⚡' },
-  { key: 'natural', label: 'Natural', emoji: '💬' },
-  { key: 'friendly', label: 'Friendly', emoji: '😊' },
-  { key: 'professional', label: 'Professional', emoji: '💼' }
-];
+const resolveSocialHref = (platform, value) => {
+  if (!value) return '';
+  const trimmed = String(value).trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  switch (platform) {
+    case 'instagram':
+      return `https://instagram.com/${trimmed.replace(/^@/, '')}`;
+    case 'facebook':
+      return `https://facebook.com/${trimmed.replace(/^@/, '')}`;
+    case 'twitter':
+      return `https://x.com/${trimmed.replace(/^@/, '')}`;
+    case 'youtube':
+      return trimmed.startsWith('@') ? `https://youtube.com/${trimmed}` : `https://youtube.com/@${trimmed}`;
+    case 'whatsapp':
+      return `https://wa.me/${trimmed.replace(/[^\d]/g, '')}`;
+    case 'linkedin':
+      return trimmed.includes('/') ? `https://linkedin.com/${trimmed}` : `https://linkedin.com/company/${trimmed}`;
+    case 'website':
+      return `https://${trimmed}`;
+    default:
+      return trimmed;
+  }
+};
+
+const resolveSocialDisplay = (platform, value) => {
+  if (!value) return '';
+  const trimmed = String(value).trim();
+  if (platform === 'whatsapp') {
+    return trimmed.startsWith('+') ? trimmed : `+${trimmed}`;
+  }
+  if (platform === 'instagram' || platform === 'twitter') {
+    const handle = trimmed.replace(/^https?:\/\/(www\.)?(instagram\.com|x\.com|twitter\.com)\//, '').replace(/\/$/, '');
+    return handle.startsWith('@') ? handle : `@${handle}`;
+  }
+  return trimmed.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+};
 
 const languages = [
   { key: 'English', label: 'English', flag: '🇺🇸' },
   { key: 'Hindi', label: 'हिंदी', flag: '🇮🇳' },
   { key: 'Hinglish', label: 'Hinglish', flag: '💬' }
 ];
+
+const ratingLabels = {
+  5: '5.0 — Excellent',
+  4: '4.0 — Good',
+  3: '3.0 — Average',
+  2: '2.0 — Below Average',
+  1: '1.0 — Disappointing'
+};
 
 const shuffleList = (items = []) => {
   const copy = [...items];
@@ -45,13 +93,17 @@ export default function BusinessPage() {
   const { slug } = useParams();
   const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [rating, setRating] = useState(5);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [tone, setTone] = useState('natural');
   const [language, setLanguage] = useState('Hinglish');
+  const [userSelectedLanguage, setUserSelectedLanguage] = useState(false);
   const [customerNote, setCustomerNote] = useState('');
   const [reviewText, setReviewText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
+  const [reviewHighlighted, setReviewHighlighted] = useState(false);
+  const reviewCardRef = useRef(null);
 
   useEffect(() => {
     const loadBusiness = async () => {
@@ -65,12 +117,17 @@ export default function BusinessPage() {
         const randomCount = Math.min(2, Math.max(1, enabledCategories.length > 2 ? 2 : enabledCategories.length));
         const defaults = shuffleList(enabledCategories).slice(0, randomCount);
         setSelectedCategories(defaults);
-        setTone(data.templateSettings?.defaultTone || 'natural');
 
-        const preferredLanguage = data.supportedLanguages?.length
-          ? (data.supportedLanguages.includes('Hinglish') ? 'Hinglish' : data.supportedLanguages[0])
-          : 'Hinglish';
-        setLanguage(preferredLanguage);
+        const supportedLangs = data.supportedLanguages?.length
+          ? data.supportedLanguages
+          : ['English', 'Hinglish'];
+        // Pick randomized initial language specifically between English and Hinglish
+        const initialCandidates = ['English', 'Hinglish'].filter((l) => supportedLangs.includes(l));
+        const randomizedInitialLang = initialCandidates.length
+          ? initialCandidates[Math.floor(Math.random() * initialCandidates.length)]
+          : 'English';
+
+        setLanguage(randomizedInitialLang);
 
         // Instant pregenerated review from server (zero wait time for customer!)
         if (data.pregeneratedReview?.review) {
@@ -78,26 +135,29 @@ export default function BusinessPage() {
           if (data.pregeneratedReview.selectedCategories?.length) {
             setSelectedCategories(data.pregeneratedReview.selectedCategories);
           }
-          if (data.pregeneratedReview.tone) {
-            setTone(data.pregeneratedReview.tone);
-          }
           if (data.pregeneratedReview.language) {
             setLanguage(data.pregeneratedReview.language);
           }
+          if (data.pregeneratedReview.rating) {
+            setRating(data.pregeneratedReview.rating);
+          }
         } else if (defaults.length) {
-          // If no advance review in buffer yet, trigger on-demand AI review generation
+          // If no advance review in buffer yet, trigger on-demand AI review generation with random tone and randomized language
+          setIsGenerating(true);
           api.post('/reviews/generate', {
             businessSlug: slug,
             selectedCategories: defaults,
-            tone: data.templateSettings?.defaultTone || 'natural',
-            language: preferredLanguage,
+            tone: 'random',
+            language: randomizedInitialLang,
             rating: 5,
             description: ''
           }).then((res) => {
             if (res.data?.review) {
               setReviewText(res.data.review);
             }
-          }).catch(() => {});
+          }).catch(() => {}).finally(() => {
+            setIsGenerating(false);
+          });
         }
       } catch (error) {
         toast.error('Business not found.');
@@ -120,25 +180,33 @@ export default function BusinessPage() {
     );
   };
 
-  const handleGenerate = async () => {
-    if (!selectedCategories.length && !customerNote.trim()) {
-      toast.error('Please select at least one tag or add a quick note.');
-      return;
-    }
-
+  const handleGenerate = async (overrideLanguage = null) => {
     setIsGenerating(true);
+    const activeLanguage = overrideLanguage || language;
     try {
+      const categoriesToSend = selectedCategories.length
+        ? selectedCategories
+        : (customerNote.trim() ? [] : ['overall']);
+
       const { data } = await api.post('/reviews/generate', {
         businessSlug: slug,
-        selectedCategories,
-        tone,
-        language,
-        rating: 5,
+        selectedCategories: categoriesToSend,
+        tone: 'random',
+        language: activeLanguage,
+        rating,
         description: customerNote.trim()
       });
       setReviewText(data.review);
-      toast.success('✨ New review generated!');
-      if (window.innerWidth < 1024) {
+      toast.success('✨ New review ready!');
+
+      // Highlight the updated review card
+      setReviewHighlighted(true);
+      setTimeout(() => setReviewHighlighted(false), 2000);
+
+      // Smoothly scroll back to the updated review preview so customer can immediately copy it
+      if (reviewCardRef.current) {
+        reviewCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
@@ -146,6 +214,16 @@ export default function BusinessPage() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleTryAnother = () => {
+    let nextLang = language;
+    if (!userSelectedLanguage) {
+      // Alternate / randomize between English and Hinglish (not Hindi)
+      nextLang = language === 'English' ? 'Hinglish' : 'English';
+      setLanguage(nextLang);
+    }
+    handleGenerate(nextLang);
   };
 
   const handleCopyOnly = async () => {
@@ -159,7 +237,7 @@ export default function BusinessPage() {
       await api.post('/reviews/track', {
         eventType: 'review-copy',
         businessSlug: slug,
-        metadata: { tone, language }
+        metadata: { rating, language }
       }).catch(() => {});
     } catch {
       toast.error('Copy failed. Please copy manually.');
@@ -183,7 +261,7 @@ export default function BusinessPage() {
     await api.post('/reviews/track', {
       eventType: 'google-review-click',
       businessSlug: slug,
-      metadata: { rating: 5, tone, language }
+      metadata: { rating, language }
     }).catch(() => {});
 
     window.open(target, '_blank', 'noopener,noreferrer');
@@ -191,10 +269,10 @@ export default function BusinessPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        <div className="flex items-center gap-3 rounded-full border border-white/10 bg-slate-900 px-6 py-3.5 text-sm font-medium text-slate-200 shadow-xl">
-          <RefreshCw size={18} className="animate-spin text-cyan-400" />
-          Loading business page...
+      <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] text-slate-800">
+        <div className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-5 py-3 text-sm font-medium text-slate-600 shadow-xs">
+          <RefreshCw size={16} className="animate-spin text-blue-600" />
+          Loading review page...
         </div>
       </div>
     );
@@ -202,10 +280,10 @@ export default function BusinessPage() {
 
   if (!business) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 text-white">
-        <div className="max-w-md rounded-3xl border border-red-500/30 bg-red-500/10 p-8 text-center">
-          <h2 className="text-xl font-bold text-red-300">Business Not Found</h2>
-          <p className="mt-2 text-sm text-slate-400">The business link you visited does not exist or may have been updated.</p>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#F8FAFC] px-4 text-slate-800">
+        <div className="max-w-md rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 text-center shadow-xs">
+          <h2 className="text-lg font-bold text-slate-900">Business Not Found</h2>
+          <p className="mt-1.5 text-xs sm:text-sm text-slate-500">The business link does not exist or may have been updated.</p>
         </div>
       </div>
     );
@@ -214,457 +292,543 @@ export default function BusinessPage() {
   const primaryColor = business.branding?.primaryColor || '#2563eb';
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_#f0f7ff_0%,_#f8fafc_60%,_#f1f5f9_100%)] text-slate-900 antialiased">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#111827] antialiased">
       <Toaster position="top-center" />
 
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2.5 sm:px-8 sm:py-3.5">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+      {/* Modern Compact Navbar */}
+      <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-2.5 sm:px-6">
+          <div className="flex items-center gap-2.5 min-w-0">
             {business.logo ? (
               <img
                 src={business.logo}
                 alt={business.businessName}
-                className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl object-cover ring-2 ring-slate-100 shrink-0"
+                className="h-8 w-8 rounded-lg object-cover ring-1 ring-slate-200/80 shrink-0"
               />
             ) : (
               <div
-                className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl font-bold text-white shadow-xs shrink-0"
+                className="flex h-8 w-8 items-center justify-center rounded-lg font-bold text-white text-xs shadow-2xs shrink-0"
                 style={{ backgroundColor: primaryColor }}
               >
                 {business.businessName.charAt(0)}
               </div>
             )}
             <div className="min-w-0">
-              <h2 className="truncate text-sm sm:text-base font-bold text-slate-900">{business.businessName}</h2>
-              <p className="truncate text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-slate-500">
-                {business.category}
+              <div className="flex items-center gap-1.5 truncate">
+                <h1 className="truncate text-sm font-semibold text-slate-900 tracking-tight">
+                  {business.businessName}
+                </h1>
+                {Boolean(business.isVerified) && (
+                  <ShieldCheck size={14} className="text-emerald-600 shrink-0" title="Verified business" />
+                )}
+              </div>
+              <p className="truncate text-[11px] text-slate-500 capitalize">
+                {business.category} {business.location ? `• ${business.location}` : ''}
               </p>
             </div>
           </div>
 
-          {/* 5-Star Badge in header */}
-          <div className="flex items-center gap-1 shrink-0 rounded-full bg-amber-50 border border-amber-200/70 px-3 py-1">
-            <div className="flex text-amber-400">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star key={star} size={13} className="fill-amber-400 text-amber-400" />
-              ))}
-            </div>
-            <span className="text-[11px] font-bold text-amber-800 ml-0.5">5.0</span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {business.contactNumber && (
+              <a
+                href={`tel:${String(business.contactNumber).replace(/[^\d+]/g, '')}`}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
+                title="Call business"
+              >
+                <Phone size={11} className="text-slate-500" />
+                <span className="hidden sm:inline">Call</span>
+              </a>
+            )}
+            {business.email && (
+              <a
+                href={`mailto:${business.email}`}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
+                title="Email business"
+              >
+                <Mail size={11} className="text-slate-500" />
+                <span className="hidden sm:inline">Email</span>
+              </a>
+            )}
+            {business.socialLinks?.whatsapp && (
+              <a
+                href={resolveSocialHref('whatsapp', business.socialLinks.whatsapp)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50/70 px-2 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100 transition"
+                title="WhatsApp business"
+              >
+                <MessageCircle size={11} className="text-emerald-600" />
+                <span className="hidden sm:inline">WhatsApp</span>
+              </a>
+            )}
+            {business.googleReviewUrl && (
+              <a
+                href={business.googleReviewUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
+              >
+                <ExternalLink size={11} className="text-slate-500" />
+                <span className="hidden sm:inline">Google</span>
+              </a>
+            )}
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-4 sm:px-8 sm:py-8 space-y-5 sm:space-y-6">
-        
-        {/* ========================================================
-            BIGGER & WIDER BUSINESS INFORMATION CARD
-           ======================================================== */}
-        <section className="relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-7 md:p-8 shadow-sm">
-          {/* Subtle brand glow backdrop */}
-          <div
-            className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full blur-3xl opacity-15"
-            style={{ backgroundColor: primaryColor }}
-          />
+      {/* Main Workspace */}
+      <main className="mx-auto max-w-4xl px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-5">
 
-          <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-5 sm:gap-6">
-            {/* Left: Logo + Business Info */}
-            <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5 min-w-0">
-              {business.logo ? (
-                <img
-                  src={business.logo}
-                  alt={business.businessName}
-                  className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-2xl object-cover ring-4 ring-slate-100 shadow-sm shrink-0"
-                />
-              ) : (
-                <div
-                  className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-2xl font-black text-2xl sm:text-3xl md:text-4xl text-white shadow-md shrink-0"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  {business.businessName.charAt(0)}
-                </div>
-              )}
-
-              <div className="min-w-0 space-y-1.5 sm:space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/70 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                    <ThumbsUp size={12} className="text-emerald-600" /> Verified Business
-                  </span>
-                  <span
-                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider"
-                    style={{ backgroundColor: `${primaryColor}15`, color: primaryColor }}
-                  >
-                    {business.category}
-                  </span>
-                </div>
-
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-                  {business.businessName}
-                </h1>
-
-                <p className="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
-                  {business.welcomeMessage || 'We value your feedback and would love to hear about your experience!'}
-                </p>
-              </div>
-            </div>
-
-            {/* Right: Large 5-Star Rating Showcase Box */}
-            <div className="flex sm:shrink-0 items-center justify-between sm:justify-center md:flex-col rounded-2xl bg-gradient-to-br from-amber-50/80 via-orange-50/50 to-amber-50/90 border border-amber-200/80 p-4 sm:px-6 sm:py-5 text-center shadow-xs">
-              <div className="text-left sm:text-center">
-                <div className="flex items-center justify-start sm:justify-center gap-1 text-amber-400">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={20} className="fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <div className="mt-1 text-base sm:text-xl font-black text-slate-900">
-                  5.0 <span className="text-xs font-semibold text-slate-600">/ 5.0 Rating</span>
-                </div>
-              </div>
-              <span className="text-[11px] font-semibold text-amber-800 bg-amber-100/70 rounded-full px-2.5 py-0.5 sm:mt-1.5">
-                Google Review Ready
+        {/* =========================================================================
+            2. Generated review preview
+            3. Copy & Post to Google Reviews button
+            4. Copy Text and Try Another actions
+            CRITICAL: Keeps preview & primary CTA at the TOP without scrolling!
+           ========================================================================= */}
+        <section
+          ref={reviewCardRef}
+          className={`scroll-mt-16 sm:scroll-mt-20 relative rounded-2xl border bg-white p-4 sm:p-5 shadow-xs transition-all duration-300 ${
+            reviewHighlighted
+              ? 'border-blue-400 ring-2 ring-blue-500/20'
+              : 'border-slate-200/80'
+          }`}
+        >
+          {/* Header row: Star Rating Choice & Character Count */}
+          <div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-slate-100">
+            <div className="flex items-center gap-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1 hidden xs:inline">
+                Rating
               </span>
-            </div>
-          </div>
-
-          {/* Quick Business Details & Contact Badges */}
-          {(business.location || business.contactNumber || business.contactName) && (
-            <div className="mt-5 pt-4 sm:mt-6 sm:pt-5 border-t border-slate-100 flex flex-wrap gap-2.5 sm:gap-3 text-xs sm:text-sm font-semibold text-slate-700">
-              {business.location && (
-                <a
-                  href={buildBusinessLocationHref(business.location, business.locationLink)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/90 px-3.5 py-2 transition hover:bg-slate-100 hover:text-blue-600"
-                >
-                  <MapPin size={15} className="text-red-500 shrink-0" />
-                  <span className="truncate max-w-[240px] sm:max-w-none">{business.location}</span>
-                  <ExternalLink size={12} className="text-slate-400" />
-                </a>
-              )}
-              {business.contactNumber && (
-                <a
-                  href={`tel:${String(business.contactNumber).replace(/[^\d+]/g, '')}`}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/90 px-3.5 py-2 transition hover:bg-slate-100 hover:text-emerald-600"
-                >
-                  <Phone size={15} className="text-emerald-600 shrink-0" />
-                  <span>{business.contactNumber}</span>
-                </a>
-              )}
-              {business.contactName && (
-                <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/90 px-3.5 py-2 text-slate-600">
-                  <User size={15} className="text-blue-500 shrink-0" />
-                  <span>{business.contactName}</span>
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-
-        {/* Builder & Review Grid:
-            On mobile (< lg): Review Card is ORDER-1 (displayed right below the business card, visible without scrolling!)
-            On desktop (>= lg): Review Card is ORDER-2 (on right side), Customizer is ORDER-1 (on left side)
-        */}
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          
-          {/* ========================================================
-              REVIEW OUTPUT CARD:
-              Order 1 on mobile: Instantly visible above the fold!
-              Order 2 on desktop: Positioned on the right column!
-             ======================================================== */}
-          <section className="order-1 lg:order-2 rounded-3xl border border-blue-200/90 bg-gradient-to-b from-blue-50/50 via-white to-white p-4 sm:p-6 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
-                    <Quote size={14} />
-                  </div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900">Your Google Review</h3>
-                </div>
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500">
-                  <PencilLine size={12} /> Tap to edit
-                </span>
-              </div>
-
-              {/* Editable Review Textarea - Compact and readable */}
-              <div className="relative mt-2.5">
-                <textarea
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  rows={3}
-                  placeholder="Generating your review..."
-                  className="w-full rounded-2xl border border-slate-200 bg-white p-3.5 text-sm leading-relaxed text-slate-800 shadow-inner outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                />
-                <div className="mt-1 flex items-center justify-between px-1 text-[11px] text-slate-400">
-                  <span className="text-emerald-600 font-medium">✓ Ready for Google Maps</span>
-                  <span>{reviewText.trim().length} chars</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Primary Action Button: Copy & Post on Google Reviews */}
-            <div className="mt-4 space-y-2.5">
-              <button
-                type="button"
-                onClick={handleGoogleRedirect}
-                disabled={!reviewText.trim()}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 px-4 text-sm sm:text-base font-bold text-white shadow-md shadow-emerald-600/20 transition hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <ExternalLink size={17} />
-                Copy & Post on Google Reviews
-              </button>
-
-              {/* Quick Secondary Buttons */}
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={handleCopyOnly}
-                  disabled={!reviewText.trim()}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {copied ? (
-                    <>
-                      <Check size={14} className="text-emerald-600" />
-                      <span className="text-emerald-700">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={13} />
-                      <span>Copy text</span>
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  disabled={isGenerating}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <RefreshCw size={13} className={isGenerating ? 'animate-spin text-blue-600' : ''} />
-                  <span>Regenerate</span>
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {/* ========================================================
-              CUSTOMIZER CONTROLS:
-              Order 2 on mobile: Directly below the review card!
-              Order 1 on desktop: Left-hand control panel!
-             ======================================================== */}
-          <section className="order-2 lg:order-1 rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-6 shadow-sm">
-            {/* Tag Selection */}
-            <div>
-              <div className="flex items-center justify-between">
-                <label className="text-xs sm:text-sm font-bold text-slate-900">What stood out most?</label>
-                <span className="text-[11px] font-semibold text-slate-500">
-                  {selectedCategories.length} selected
-                </span>
-              </div>
-              <p className="mt-0.5 text-[11px] text-slate-500">Tap tags to personalize your review</p>
-
-              <div className="mt-2.5 flex flex-wrap gap-1.5 sm:gap-2">
-                {totalCategories.map((item) => {
-                  const isSelected = selectedCategories.includes(item.key);
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((starValue) => {
+                  const isFilled = starValue <= rating;
                   return (
                     <button
-                      key={item.key}
+                      key={starValue}
                       type="button"
-                      onClick={() => toggleCategory(item.key)}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-                        isSelected
-                          ? 'bg-slate-900 text-white shadow-xs ring-1 ring-slate-900'
-                          : 'border border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
-                      }`}
+                      onClick={() => setRating(starValue)}
+                      className="p-0.5 rounded hover:bg-slate-100 transition active:scale-95"
+                      aria-label={`Select ${starValue} stars`}
                     >
-                      {isSelected && <Check size={12} className="text-emerald-400" />}
-                      {item.name}
+                      <Star
+                        size={18}
+                        className={isFilled ? 'fill-amber-400 text-amber-400' : 'text-slate-200 hover:text-amber-300'}
+                      />
                     </button>
                   );
                 })}
               </div>
+              <span className="text-xs font-semibold text-slate-700 ml-1">
+                {ratingLabels[rating]}
+              </span>
             </div>
 
-            {/* Optional Personal Detail */}
-            <div className="mt-4">
-              <label className="text-xs sm:text-sm font-bold text-slate-900">
-                Add a specific detail <span className="text-[11px] font-normal text-slate-500">(Optional)</span>
-              </label>
-              <input
-                type="text"
-                value={customerNote}
-                onChange={(e) => setCustomerNote(e.target.value)}
-                maxLength={180}
-                placeholder="e.g. Loved the iced latte and friendly service!"
-                className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/10"
+            <div className="flex items-center gap-2 text-[11px] text-slate-400">
+              <span className="hidden sm:inline-flex items-center gap-1">
+                <PencilLine size={11} /> Tap text to edit
+              </span>
+              <span>{reviewText.trim().length} chars</span>
+            </div>
+          </div>
+
+          {/* 2. Distraction-Free Review Text Editor / Loading Shimmer */}
+          <div className="relative">
+            {isGenerating && !reviewText ? (
+              <div className="flex items-center gap-2.5 py-6 text-xs sm:text-sm text-slate-500">
+                <RefreshCw size={15} className="animate-spin text-blue-600" />
+                <span>Crafting your ready-to-use review...</span>
+              </div>
+            ) : (
+              <textarea
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                rows={3}
+                placeholder="Your generated review will appear here..."
+                className="w-full resize-none rounded-xl border-0 bg-transparent p-0 text-sm sm:text-base leading-relaxed text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0"
               />
-            </div>
+            )}
+          </div>
 
-            {/* Tone & Language side-by-side or stacked */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Tone */}
-              <div>
-                <label className="text-xs font-bold text-slate-900">Tone</label>
-                <div className="mt-1.5 grid grid-cols-2 gap-1.5">
-                  {tones.map((t) => {
-                    const isSelected = tone === t.key;
-                    return (
-                      <button
-                        key={t.key}
-                        type="button"
-                        onClick={() => setTone(t.key)}
-                        className={`flex items-center justify-center gap-1 rounded-lg border py-1.5 px-2 text-[11px] font-medium transition-all ${
-                          isSelected
-                            ? 'border-blue-500 bg-blue-50 text-blue-700 font-semibold shadow-xs ring-1 ring-blue-500'
-                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        <span>{t.emoji}</span>
-                        <span>{t.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+          {/* 3. Copy & Post to Google Reviews button & 4. Copy Text / Try Another actions */}
+          <div className="mt-3.5 pt-3 border-t border-slate-100 space-y-2">
+            {/* 3. Primary CTA: Copy & Post on Google Reviews */}
+            <button
+              type="button"
+              onClick={handleGoogleRedirect}
+              disabled={!reviewText.trim()}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-3.5 px-4 text-xs sm:text-sm font-semibold text-white shadow-xs transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ExternalLink size={16} />
+              <span>Copy & Post on Google Reviews</span>
+            </button>
 
-              {/* Language */}
-              <div>
-                <label className="text-xs font-bold text-slate-900">Language</label>
-                <div className="mt-1.5 grid grid-cols-3 gap-1.5">
-                  {languages.map((l) => {
-                    const isSelected = language === l.key;
-                    return (
-                      <button
-                        key={l.key}
-                        type="button"
-                        onClick={() => setLanguage(l.key)}
-                        className={`flex items-center justify-center gap-1 rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all ${
-                          isSelected
-                            ? 'border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold shadow-xs ring-1 ring-emerald-500'
-                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        <span>{l.flag}</span>
-                        <span>{l.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Update / Generate Button */}
-            <div className="mt-5 pt-3.5 border-t border-slate-100">
+            {/* 4. Quick Secondary Actions */}
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-3 px-4 text-xs sm:text-sm font-semibold text-white shadow-xs transition hover:bg-slate-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+                onClick={handleCopyOnly}
+                disabled={!reviewText.trim()}
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-slate-100 py-2.5 px-3 text-xs font-medium text-slate-700 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {isGenerating ? (
+                {copied ? (
                   <>
-                    <RefreshCw size={14} className="animate-spin text-cyan-400" />
-                    Generating concise review...
+                    <Check size={13} className="text-emerald-600 stroke-[2.5]" />
+                    <span className="text-emerald-700 font-semibold">Copied!</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles size={14} className="text-amber-300" />
-                    Update Review with Options
+                    <Copy size={13} className="text-slate-500" />
+                    <span>Copy Text</span>
                   </>
                 )}
               </button>
+
+              <button
+                type="button"
+                onClick={handleTryAnother}
+                disabled={isGenerating}
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-slate-100 py-2.5 px-3 text-xs font-medium text-slate-700 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                title="Generate another version"
+              >
+                <RefreshCw size={13} className={`text-slate-500 ${isGenerating ? 'animate-spin text-blue-600' : ''}`} />
+                <span>Try Another</span>
+              </button>
             </div>
-          </section>
+          </div>
+        </section>
 
-        </div>
+        {/* =========================================================================
+            INTERACTIVE CUSTOMIZATION (Linear / Stripe style)
+            Allows fine-tuning of tags, specific details & language (tone is selected randomly by AI).
+           ========================================================================= */}
+        <section className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900 tracking-tight">
+                Customize Experience Tags & Style
+              </h2>
+              <p className="text-xs text-slate-500">
+                Select highlights to personalize the AI-crafted review
+              </p>
+            </div>
+            <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+              {selectedCategories.length} selected
+            </span>
+          </div>
 
-        {/* Location & Navigation Card - Fast, zero-blocking, mobile-optimized */}
-        {business.location && (
-          <section className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-7 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">
-                  <MapPin size={12} className="text-blue-600" />
-                  Google Maps Location
-                </div>
-                <h3 className="mt-1 text-base sm:text-lg font-bold text-slate-900">{business.businessName}</h3>
-                <p className="mt-0.5 flex items-center gap-1.5 text-xs sm:text-sm text-slate-600">
-                  <span className="font-medium text-slate-800">{business.location}</span>
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <a
-                  href={buildDirectionsHref(business.location, business.locationLink)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.98]"
-                >
-                  <Navigation size={14} /> Get Directions
-                </a>
-                <a
-                  href={buildBusinessLocationHref(business.location, business.locationLink)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
-                >
-                  <ExternalLink size={14} /> Open in Maps
-                </a>
-                {business.contactNumber && (
-                  <a
-                    href={`tel:${String(business.contactNumber).replace(/[^\d+]/g, '')}`}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+          {/* Topic Chips (Linear / Stripe tag style) */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">
+              Experience Highlights
+            </label>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+              {totalCategories.map((item) => {
+                const isSelected = selectedCategories.includes(item.key);
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => toggleCategory(item.key)}
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition active:scale-[0.98] ${
+                      isSelected
+                        ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-500/30'
+                        : 'bg-slate-100/70 text-slate-600 hover:bg-slate-200/60 hover:text-slate-800'
+                    }`}
                   >
-                    <Phone size={14} className="text-emerald-600" /> Call
-                  </a>
-                )}
-              </div>
+                    {isSelected && <Check size={12} className="text-blue-600 stroke-[2.5]" />}
+                    <span>{item.name}</span>
+                  </button>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Stylized Interactive Map Preview banner */}
-            <a
-              href={buildBusinessLocationHref(business.location, business.locationLink)}
-              target="_blank"
-              rel="noreferrer"
-              className="group relative mt-4 block overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-100 via-blue-50/40 to-slate-200/70 p-6 sm:p-8 transition hover:border-blue-300 hover:shadow-md"
+          {/* Optional Detail Input */}
+          <div className="space-y-1">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">
+              Specific Detail <span className="normal-case font-normal text-slate-400">(Optional)</span>
+            </label>
+            <input
+              type="text"
+              value={customerNote}
+              onChange={(e) => setCustomerNote(e.target.value)}
+              maxLength={180}
+              placeholder="e.g. Loved the iced latte and friendly service"
+              className="w-full rounded-xl border border-slate-200/80 bg-white px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+            />
+          </div>
+
+          {/* Language Selection */}
+          <div className="space-y-1 pt-1">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">
+              Language
+            </label>
+            <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1">
+              {languages.map((l) => {
+                const isSelected = language === l.key;
+                return (
+                  <button
+                    key={l.key}
+                    type="button"
+                    onClick={() => {
+                      setLanguage(l.key);
+                      setUserSelectedLanguage(true);
+                    }}
+                    className={`flex items-center justify-center gap-1.5 rounded-lg py-2 px-2 text-xs font-medium transition ${
+                      isSelected
+                        ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <span className="text-sm">{l.flag}</span>
+                    <span>{l.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 9. Generate My Review button */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 py-3.5 px-4 text-xs sm:text-sm font-semibold text-white shadow-xs transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {/* Subtle background street grid lines */}
-              <div
-                className="pointer-events-none absolute inset-0 opacity-40"
-                style={{
-                  backgroundImage:
-                    'radial-gradient(circle, #94a3b8 1px, transparent 1px), linear-gradient(to right, #cbd5e1 1px, transparent 1px), linear-gradient(to bottom, #cbd5e1 1px, transparent 1px)',
-                  backgroundSize: '24px 24px, 48px 48px, 48px 48px'
-                }}
-              />
+              {isGenerating ? (
+                <>
+                  <RefreshCw size={15} className="animate-spin text-slate-300" />
+                  <span>Crafting Review...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={15} className="text-amber-300" />
+                  <span>Generate My Review</span>
+                </>
+              )}
+            </button>
+          </div>
+        </section>
 
-              <div className="relative z-10 flex flex-col items-center justify-center text-center">
-                {/* Pulsing Pin Marker */}
-                <div className="relative mb-3 flex items-center justify-center">
-                  <span className="absolute h-12 w-12 animate-ping rounded-full bg-red-400 opacity-30" />
-                  <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 text-white shadow-lg shadow-red-500/30">
-                    <MapPin size={24} className="drop-shadow" />
+        {/* =========================================================================
+            10. Business location & Social Handles / Contact
+           ========================================================================= */}
+        {(business.location || business.contactNumber || business.email || (business.socialLinks && Object.values(business.socialLinks).some(Boolean))) && (
+          <section className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs space-y-4">
+            {/* Location row */}
+            {business.location && (
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 shrink-0">
+                      <MapPin size={16} />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
+                        {business.businessName}
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-slate-500 truncate">
+                        {business.location}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <a
+                      href={buildDirectionsHref(business.location, business.locationLink)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs font-semibold shadow-xs transition active:scale-[0.98]"
+                    >
+                      <Navigation size={12} />
+                      <span>Directions</span>
+                    </a>
+                    <a
+                      href={buildBusinessLocationHref(business.location, business.locationLink)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-white hover:bg-slate-50 text-slate-700 px-3 py-1.5 text-xs font-medium transition"
+                    >
+                      <ExternalLink size={12} className="text-slate-500" />
+                      <span>Maps</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setIsMapExpanded(!isMapExpanded)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-slate-50 hover:bg-slate-100 text-slate-600 px-2 py-1.5 text-xs font-medium transition"
+                      aria-expanded={isMapExpanded}
+                      title="Toggle map view"
+                    >
+                      {isMapExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                    </button>
                   </div>
                 </div>
 
-                <div className="max-w-md rounded-xl border border-white/80 bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur-sm">
-                  <p className="text-xs sm:text-sm font-bold text-slate-900">{business.businessName}</p>
-                  <p className="text-[11px] sm:text-xs text-slate-600 line-clamp-1">{business.location}</p>
+                {/* Collapsible map banner */}
+                {isMapExpanded && (
+                  <a
+                    href={buildBusinessLocationHref(business.location, business.locationLink)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group relative mt-3 block overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50 p-5 text-center transition hover:border-slate-300"
+                  >
+                    <div
+                      className="pointer-events-none absolute inset-0 opacity-20"
+                      style={{
+                        backgroundImage:
+                          'radial-gradient(circle, #94a3b8 1px, transparent 1px), linear-gradient(to right, #cbd5e1 1px, transparent 1px), linear-gradient(to bottom, #cbd5e1 1px, transparent 1px)',
+                        backgroundSize: '24px 24px, 48px 48px, 48px 48px'
+                      }}
+                    />
+                    <div className="relative z-10 flex flex-col items-center justify-center">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white shadow-xs mb-1.5">
+                        <MapPin size={16} />
+                      </div>
+                      <p className="text-xs font-semibold text-slate-900">{business.businessName}</p>
+                      <p className="text-[11px] text-slate-500 truncate max-w-sm">{business.location}</p>
+                      <span className="mt-1.5 text-[11px] font-medium text-blue-600 group-hover:underline inline-flex items-center gap-1">
+                        Open in Google Maps <ExternalLink size={10} />
+                      </span>
+                    </div>
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* Social Handles, Phone & Email section */}
+            {(business.contactNumber || business.email || (business.socialLinks && Object.values(business.socialLinks).some(Boolean))) && (
+              <div className={business.location ? 'pt-3.5 border-t border-slate-100' : ''}>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                    Connect & Follow Us
+                  </h4>
+                  <span className="text-[11px] text-slate-400">Official Handles</span>
                 </div>
 
-                <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 group-hover:underline">
-                  <span>Tap to view live location & navigation on Google Maps</span>
-                  <ExternalLink size={13} />
+                <div className="flex flex-wrap gap-2">
+                  {business.contactNumber && (
+                    <a
+                      href={`tel:${String(business.contactNumber).replace(/[^\d+]/g, '')}`}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 px-3 py-1.5 text-xs font-medium text-slate-700 transition"
+                      title="Call business"
+                    >
+                      <Phone size={13} className="text-blue-600" />
+                      <span>{business.contactNumber}</span>
+                    </a>
+                  )}
+
+                  {business.email && (
+                    <a
+                      href={`mailto:${business.email}`}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 px-3 py-1.5 text-xs font-medium text-slate-700 transition"
+                      title="Email business"
+                    >
+                      <Mail size={13} className="text-blue-600" />
+                      <span>{business.email}</span>
+                    </a>
+                  )}
+
+                  {business.socialLinks?.whatsapp && (
+                    <a
+                      href={resolveSocialHref('whatsapp', business.socialLinks.whatsapp)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200/80 bg-emerald-50/50 hover:bg-emerald-100/70 hover:border-emerald-300 text-emerald-800 px-3 py-1.5 text-xs font-medium transition"
+                      title="Chat on WhatsApp"
+                    >
+                      <MessageCircle size={13} className="text-emerald-600" />
+                      <span>WhatsApp {resolveSocialDisplay('whatsapp', business.socialLinks.whatsapp)}</span>
+                    </a>
+                  )}
+
+                  {business.socialLinks?.instagram && (
+                    <a
+                      href={resolveSocialHref('instagram', business.socialLinks.instagram)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-pink-200/80 bg-pink-50/50 hover:bg-pink-100/70 hover:border-pink-300 text-pink-800 px-3 py-1.5 text-xs font-medium transition"
+                      title="Instagram Profile"
+                    >
+                      <Instagram size={13} className="text-pink-600" />
+                      <span>{resolveSocialDisplay('instagram', business.socialLinks.instagram)}</span>
+                    </a>
+                  )}
+
+                  {business.socialLinks?.website && (
+                    <a
+                      href={resolveSocialHref('website', business.socialLinks.website)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 px-3 py-1.5 text-xs font-medium text-slate-700 transition"
+                      title="Official Website"
+                    >
+                      <Globe size={13} className="text-blue-600" />
+                      <span>{resolveSocialDisplay('website', business.socialLinks.website)}</span>
+                    </a>
+                  )}
+
+                  {business.socialLinks?.facebook && (
+                    <a
+                      href={resolveSocialHref('facebook', business.socialLinks.facebook)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 px-3 py-1.5 text-xs font-medium text-slate-700 transition"
+                      title="Facebook Page"
+                    >
+                      <Facebook size={13} className="text-blue-700" />
+                      <span>Facebook</span>
+                    </a>
+                  )}
+
+                  {business.socialLinks?.twitter && (
+                    <a
+                      href={resolveSocialHref('twitter', business.socialLinks.twitter)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 px-3 py-1.5 text-xs font-medium text-slate-700 transition"
+                      title="X / Twitter Handle"
+                    >
+                      <Twitter size={13} className="text-slate-800" />
+                      <span>{resolveSocialDisplay('twitter', business.socialLinks.twitter)}</span>
+                    </a>
+                  )}
+
+                  {business.socialLinks?.youtube && (
+                    <a
+                      href={resolveSocialHref('youtube', business.socialLinks.youtube)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-red-200/80 bg-red-50/50 hover:bg-red-100/70 hover:border-red-300 text-red-800 px-3 py-1.5 text-xs font-medium transition"
+                      title="YouTube Channel"
+                    >
+                      <Youtube size={13} className="text-red-600" />
+                      <span>YouTube</span>
+                    </a>
+                  )}
+
+                  {business.socialLinks?.linkedin && (
+                    <a
+                      href={resolveSocialHref('linkedin', business.socialLinks.linkedin)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200/80 bg-blue-50/50 hover:bg-blue-100/70 hover:border-blue-300 text-blue-800 px-3 py-1.5 text-xs font-medium transition"
+                      title="LinkedIn Page"
+                    >
+                      <Linkedin size={13} className="text-blue-700" />
+                      <span>LinkedIn</span>
+                    </a>
+                  )}
                 </div>
               </div>
-            </a>
+            )}
           </section>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="mt-8 border-t border-slate-200/80 bg-white py-6 text-center text-xs text-slate-500">
-        <p>Powered by <span className="font-semibold text-slate-700">Review Connect</span> • Verified Google Reviews</p>
+      {/* Clean Linear-style Footer */}
+      <footer className="mt-8 border-t border-slate-200/60 bg-white py-5 text-center text-[11px] text-slate-400">
+        <p>Powered by <span className="font-medium text-slate-600">Review Connect</span> • Google Reviews Assistant</p>
       </footer>
     </div>
   );

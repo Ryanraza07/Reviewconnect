@@ -9,8 +9,58 @@ const languageMap = {
 const categoryMap = {
   restaurant: 'restaurant',
   cafe: 'restaurant',
+  bakery: 'restaurant',
+  dining: 'restaurant',
+  food: 'restaurant',
   salon: 'salon',
-  clinic: 'clinic'
+  spa: 'salon',
+  beauty: 'salon',
+  parlour: 'salon',
+  barber: 'salon',
+  clinic: 'clinic',
+  hospital: 'clinic',
+  dental: 'clinic',
+  doctor: 'clinic',
+  healthcare: 'clinic',
+  general_store: 'general_store',
+  supermarket: 'general_store',
+  grocery: 'general_store',
+  kirana: 'general_store',
+  mart: 'general_store',
+  retail: 'general_store',
+  optical: 'optical',
+  optical_shop: 'optical',
+  eyewear: 'optical',
+  optometry: 'optical',
+  optician: 'optical',
+  pharmacy: 'pharmacy',
+  chemist: 'pharmacy',
+  medical: 'pharmacy',
+  druggist: 'pharmacy',
+  electronics: 'electronics',
+  mobile: 'electronics',
+  gadgets: 'electronics',
+  appliances: 'electronics',
+  computer: 'electronics',
+  fashion: 'fashion',
+  clothing: 'fashion',
+  boutique: 'fashion',
+  apparel: 'fashion',
+  garments: 'fashion',
+  gym: 'gym',
+  fitness: 'gym',
+  workout: 'gym',
+  yoga: 'gym',
+  automobile: 'automobile',
+  garage: 'automobile',
+  car_service: 'automobile',
+  bike_service: 'automobile',
+  workshop: 'automobile',
+  hotel: 'hotel',
+  hospitality: 'hotel',
+  resort: 'hotel',
+  stay: 'hotel',
+  lodging: 'hotel'
 };
 
 const toneMap = {
@@ -31,9 +81,24 @@ const toTitleCase = (value = '') =>
     .join(' ');
 
 const resolveCategory = (value = 'restaurant') => categoryMap[String(value).toLowerCase()] || 'restaurant';
-const resolveLanguage = (value = 'Hinglish') =>
-  languageMap[String(value).toLowerCase()] || 'hinglish';
-const resolveTone = (value = 'natural') => toneMap[String(value).toLowerCase()] || 'natural';
+const resolveLanguage = (value = 'Hinglish') => {
+  const normalized = String(value || '').toLowerCase().trim();
+  if (normalized === 'random' || normalized === 'auto') {
+    const list = ['english', 'hinglish'];
+    return list[Math.floor(Math.random() * list.length)];
+  }
+  return languageMap[normalized] || 'hinglish';
+};
+export const availableTones = ['natural', 'friendly', 'professional', 'simple'];
+export const getRandomTone = () => availableTones[Math.floor(Math.random() * availableTones.length)];
+
+const resolveTone = (value = 'random') => {
+  const normalized = String(value || '').toLowerCase().trim();
+  if (!normalized || normalized === 'random' || normalized === 'auto') {
+    return getRandomTone();
+  }
+  return toneMap[normalized] || getRandomTone();
+};
 
 const categoryAliases = new Map([
   ['staff', 'staff'],
@@ -89,7 +154,54 @@ const categoryAliases = new Map([
   ['response time', 'service'],
   ['problem resolution', 'service'],
   ['scheduling', 'service'],
-  ['aftercare', 'service']
+  ['aftercare', 'service'],
+  ['variety', 'variety'],
+  ['product variety', 'variety'],
+  ['stock', 'variety'],
+  ['eyetest', 'eyetest'],
+  ['eye test', 'eyetest'],
+  ['eye checkup', 'eyetest'],
+  ['frames', 'frames'],
+  ['frame collection', 'frames'],
+  ['lenses', 'lenses'],
+  ['lens quality', 'lenses'],
+  ['billing', 'billing'],
+  ['checkout', 'billing'],
+  ['quick billing', 'billing'],
+  ['delivery', 'delivery'],
+  ['on-time delivery', 'delivery'],
+  ['fitting', 'fitting'],
+  ['frame fitting', 'fitting'],
+  ['warranty', 'warranty'],
+  ['aftersales', 'warranty'],
+  ['availability', 'availability'],
+  ['medicine availability', 'availability'],
+  ['genuineness', 'genuineness'],
+  ['genuine products', 'genuineness'],
+  ['product range', 'product_range'],
+  ['demo', 'demo'],
+  ['product demo', 'demo'],
+  ['collection', 'collection'],
+  ['latest collection', 'collection'],
+  ['fabric', 'fabric'],
+  ['stitching', 'fabric'],
+  ['alteration', 'alteration'],
+  ['equipment', 'equipment'],
+  ['gym equipment', 'equipment'],
+  ['trainers', 'trainers'],
+  ['trainer guidance', 'trainers'],
+  ['workout floor', 'space'],
+  ['mechanic', 'expertise'],
+  ['turnaround', 'turnaround'],
+  ['transparency', 'transparency'],
+  ['genuine parts', 'genuine_parts'],
+  ['spare parts', 'genuine_parts'],
+  ['diagnostics', 'diagnostics'],
+  ['rooms', 'rooms'],
+  ['room cleanliness', 'rooms'],
+  ['bedding', 'bedding'],
+  ['bathroom', 'bathroom'],
+  ['checkin', 'checkin']
 ]);
 
 const canonicalizeCategory = (value = '') => {
@@ -150,6 +262,118 @@ const reviewTagMetadata = {
     comfort: { name: 'Comfort' },
     waiting: { name: 'Waiting time' },
     accessibility: { name: 'Accessibility' }
+  },
+  general_store: {
+    staff: { name: 'Staff behaviour' },
+    overall: { name: 'Overall experience' },
+    variety: { name: 'Product variety & stock' },
+    affordability: { name: 'Pricing & value' },
+    billing: { name: 'Billing speed & checkout' },
+    freshness: { name: 'Freshness of items' },
+    cleanliness: { name: 'Store cleanliness' },
+    service: { name: 'Customer assistance' },
+    location: { name: 'Location & accessibility' },
+    discounts: { name: 'Offers & discounts' },
+    organization: { name: 'Ease of finding items' },
+    digitalpayment: { name: 'Payment convenience' }
+  },
+  optical: {
+    staff: { name: 'Staff behaviour' },
+    overall: { name: 'Overall experience' },
+    eyetest: { name: 'Eye testing accuracy' },
+    frames: { name: 'Frame collection & variety' },
+    lenses: { name: 'Lens quality & clarity' },
+    affordability: { name: 'Pricing & value' },
+    delivery: { name: 'On-time delivery' },
+    fitting: { name: 'Frame fitting & comfort' },
+    cleanliness: { name: 'Store cleanliness' },
+    service: { name: 'Customer service' },
+    consultation: { name: 'Optometrist guidance' },
+    warranty: { name: 'After-sales & warranty' }
+  },
+  pharmacy: {
+    staff: { name: 'Pharmacist behaviour' },
+    overall: { name: 'Overall experience' },
+    availability: { name: 'Medicine availability' },
+    billing: { name: 'Quick billing & packing' },
+    affordability: { name: 'Genuine rates & discounts' },
+    cleanliness: { name: 'Store hygiene & storage' },
+    guidance: { name: 'Prescription guidance' },
+    delivery: { name: 'Home delivery service' },
+    digitalpayment: { name: 'Payment options' },
+    location: { name: 'Location convenience' },
+    genuineness: { name: 'Genuine medicines' },
+    emergency: { name: 'Prompt assistance' }
+  },
+  electronics: {
+    staff: { name: 'Staff behaviour' },
+    overall: { name: 'Overall experience' },
+    product_range: { name: 'Gadget variety & stock' },
+    genuineness: { name: '100% genuine products' },
+    affordability: { name: 'Best pricing & deals' },
+    demo: { name: 'Product demo & guidance' },
+    service: { name: 'Customer service' },
+    billing: { name: 'Quick billing & invoice' },
+    warranty: { name: 'Warranty & guarantee' },
+    payment: { name: 'EMI & payment options' },
+    ambience: { name: 'Store display & ambience' },
+    aftersales: { name: 'After-sales support' }
+  },
+  fashion: {
+    staff: { name: 'Staff assistance' },
+    overall: { name: 'Overall experience' },
+    collection: { name: 'Latest design collection' },
+    fabric: { name: 'Fabric & stitching quality' },
+    fitting: { name: 'Trial room & fitting' },
+    affordability: { name: 'Reasonable pricing' },
+    variety: { name: 'Color & size variety' },
+    ambience: { name: 'Showroom ambience' },
+    billing: { name: 'Smooth billing' },
+    alteration: { name: 'Alteration service' },
+    discounts: { name: 'Seasonal discounts' },
+    cleanliness: { name: 'Store neatness' }
+  },
+  gym: {
+    staff: { name: 'Staff & trainer behaviour' },
+    overall: { name: 'Overall experience' },
+    equipment: { name: 'Modern workout machines' },
+    cleanliness: { name: 'Hygiene & sanitization' },
+    trainers: { name: 'Certified trainer guidance' },
+    ambience: { name: 'Music & workout vibe' },
+    affordability: { name: 'Membership pricing' },
+    space: { name: 'Spacious workout floor' },
+    ventilation: { name: 'AC & ventilation' },
+    crowd: { name: 'Crowd management' },
+    facilities: { name: 'Lockers & changing rooms' },
+    timings: { name: 'Flexible operating hours' }
+  },
+  automobile: {
+    staff: { name: 'Mechanic behaviour' },
+    overall: { name: 'Overall experience' },
+    expertise: { name: 'Mechanical expertise' },
+    turnaround: { name: 'Turnaround time' },
+    transparency: { name: 'Transparent cost estimate' },
+    affordability: { name: 'Reasonable repair charges' },
+    genuine_parts: { name: 'Genuine spare parts' },
+    cleanliness: { name: 'Washing & cleanup' },
+    service: { name: 'Service quality' },
+    pickup_drop: { name: 'Pickup & drop facility' },
+    diagnostics: { name: 'Accurate problem diagnosis' },
+    updates: { name: 'Timely status updates' }
+  },
+  hotel: {
+    staff: { name: 'Staff hospitality' },
+    overall: { name: 'Overall stay experience' },
+    rooms: { name: 'Room cleanliness & comfort' },
+    bedding: { name: 'Bedding & linen quality' },
+    bathroom: { name: 'Clean bathrooms & hot water' },
+    checkin: { name: 'Fast check-in & check-out' },
+    food: { name: 'Room service & breakfast' },
+    location: { name: 'Location & accessibility' },
+    affordability: { name: 'Value for money' },
+    wifi: { name: 'High-speed Wi-Fi & AC' },
+    parking: { name: 'Safe parking facility' },
+    safety: { name: 'Security & peaceful stay' }
   }
 };
 
@@ -178,6 +402,134 @@ const uniqueText = (items) => {
   return result;
 };
 
+export function pickRandomLengthProfile(tone = 'natural', preferredLength = 'random') {
+  if (preferredLength && preferredLength !== 'random') {
+    switch (preferredLength) {
+      case 'short':
+      case 'small':
+        return {
+          type: 'short',
+          instruction: '- LENGTH: VERY SHORT & PUNCHY (1 single crisp sentence or 2 brief phrases, strictly under 16 words / around 40-90 characters total). Sound like someone leaving a quick 5-second rating on Google Maps from their phone.'
+        };
+      case 'long':
+      case 'big':
+        return {
+          type: 'long',
+          instruction: '- LENGTH: DETAILED & THOROUGH (3 to 5 descriptive sentences, roughly 50-80 words / around 260-420 characters total). Share a vivid, complete review describing the visit in more depth (e.g. what stood out about the ambience, staff responsiveness, specific quality of experience, and a strong personal recommendation for other visitors).'
+        };
+      case 'medium':
+      default:
+        return {
+          type: 'medium',
+          instruction: '- LENGTH: MEDIUM & BALANCED (2 to 3 natural sentences, roughly 25-45 words / around 125-210 characters total). Highlight the main positive impressions with natural casual flow.'
+        };
+    }
+  }
+
+  // If tone is explicitly "Short" ('simple')
+  if (tone === 'simple') {
+    return Math.random() < 0.75
+      ? {
+          type: 'short',
+          instruction: '- LENGTH: VERY SHORT & PUNCHY (1 crisp sentence or 2 brief phrases, strictly under 16 words / around 40-90 characters total). Keep it snappy and quick.'
+        }
+      : {
+          type: 'medium',
+          instruction: '- LENGTH: SHORT-TO-MEDIUM (2 short sentences, roughly 20-30 words / around 100-160 characters total).'
+        };
+  }
+
+  // Pure random variation across SMALL, MEDIUM, and BIG (approx 33% each)
+  const roll = Math.random();
+  if (roll < 0.33) {
+    // 1. SMALL (Short & punchy ~40-90 characters)
+    return {
+      type: 'short',
+      instruction: '- LENGTH: VERY SHORT & PUNCHY (1 single crisp sentence or 2 brief punchy phrases, strictly between 8-16 words / around 40-90 characters total). Sound like someone leaving a quick 5-second rating on Google Maps from their phone.'
+    };
+  } else if (roll < 0.67) {
+    // 2. MEDIUM (Standard balanced ~125-210 characters)
+    return {
+      type: 'medium',
+      instruction: '- LENGTH: MEDIUM & BALANCED (2 to 3 natural sentences, roughly 25-45 words / around 125-210 characters total). Balance the experience highlights with a natural casual remark.'
+    };
+  } else {
+    // 3. BIG (Detailed & thorough ~260-420 characters)
+    return {
+      type: 'long',
+      instruction: '- LENGTH: DETAILED & THOROUGH (3 to 5 expressive sentences, roughly 50-80 words / around 260-420 characters total). Share a rich, descriptive review mentioning the visit in more depth (e.g. the ambience, staff attentiveness, specific quality of experience, and a strong personal recommendation for others).'
+    };
+  }
+}
+
+export const reviewerAngles = [
+  'Understated and practical perspective: Focus on cleanliness, promptness, smooth handling, and fair pricing without hype.',
+  'Sensory and observant perspective: Focus on tangible physical details like sounds, seating comfort, cleanliness, temperature, lighting, or aroma.',
+  'Casual text-message style: Sounds completely unpolished and natural, like something texted to a friend or family member.',
+  'Matter-of-fact direct verdict: Straightforward customer evaluation of speed, service quality, and overall execution without marketing buzzwords.',
+  'First-time visitor perspective: Stopped by for the first time, pleasant impression regarding the quality and unhurried experience.',
+  'Thoughtful and patient perspective: Appreciates attentive care, respectful communication, hygiene, and care taken with customer requests.',
+  'Quick mobile reviewer perspective: Crisp, direct feedback typed right after the visit from a phone.'
+];
+
+export const pickRandomReviewerAngle = () =>
+  reviewerAngles[Math.floor(Math.random() * reviewerAngles.length)];
+
+const FORBIDDEN_CLICHES = [
+  'In English: "go-to spot/place/salon", "hidden gem", "top-notch", "highly recommend", "highly recommended", "must visit", "must-visit", "super friendly", "hassle-free", "worth every penny", "from the moment I stepped/walked in", "look no further", "exceeded my expectations", "10/10", "game changer".',
+  'In Hinglish: "ekdum mast", "ekdum top-notch", "top notch", "highly recommend", "highly recommended", "kaafi polite", "totally worth it", "dil jeet liya", "ab se regular yahi aunga", "bilkul miss mat karna", "bohot hi pyaara vibe", "meri toh jaan nikli jaa rahi thi", "truly best", "ek number".'
+];
+
+const getFreshVocabularyHints = (language = 'hinglish', category = 'restaurant') => {
+  const cat = String(category || '').toLowerCase();
+  const isEnglish = String(language || '').toLowerCase() === 'english';
+
+  const categoryHints = {
+    optical: {
+      en: 'Draw from optical-specific words like accurate eye test, comfortable frame fitting, clear vision lenses, patient optometry consultation, prompt delivery, neat display.',
+      hi: 'Draw from optical words like accurate eye testing, frames ka badhiya collection, time par delivery, lightweight aur comfortable fitting, tasalli se checkup.'
+    },
+    general_store: {
+      en: 'Draw from retail words like well-stocked inventory, fresh packaged goods, speedy checkout, organized aisles, fair pricing, convenient shopping.',
+      hi: 'Draw from store words like fresh grocery stock, fast billing counter, saara daily samaan ek jagah, sahi rate, neat aisles, bina bheed ke aaram se shopping.'
+    },
+    pharmacy: {
+      en: 'Draw from pharmacy words like properly stored medicines, prompt dispensing, verified prescriptions, polite pharmacist, transparent billing.',
+      hi: 'Draw from medical words like saari medicines turant mil gayi, genuine bill, chemist ne dosage sahi se samjhaya, safe storage.'
+    },
+    electronics: {
+      en: 'Draw from electronics words like genuine product warranty, clear product demo, competitive pricing, knowledgeable staff, smooth purchase setup.',
+      hi: 'Draw from gadget words like genuine sealed product, best price deal, demo acche se samjhaya, billing aur warranty jaldi ban gayi.'
+    },
+    fashion: {
+      en: 'Draw from fashion words like trendy design collection, comfortable fabric, clean trial rooms, reasonable pricing, helpful styling assistance.',
+      hi: 'Draw from boutique words like latest kapdo ka collection, cloth quality badhiya hai, trial room neat tha, smooth billing aur fitting.'
+    },
+    gym: {
+      en: 'Draw from fitness words like well-maintained weights, clean machines, motivating atmosphere, knowledgeable trainers, spacious floor, good ventilation.',
+      hi: 'Draw from gym words like machines well-maintained hain, trainers supportive hain, proper ventilation aur safe workout environment.'
+    },
+    automobile: {
+      en: 'Draw from automotive words like honest cost estimate, resolved the mechanical issue promptly, clean handover, transparent repair billing.',
+      hi: 'Draw from garage words like bina kisi extra charge ke sahi kaam kiya, mechanic ne issue ache se explain kiya, timely delivery di.'
+    },
+    hotel: {
+      en: 'Draw from hospitality words like spotless linen, quiet room, warm front desk, prompt room service, comfortable sleep, safe parking.',
+      hi: 'Draw from hotel words like room bilkul neat aur clean tha, AC aur hot water proper chal raha tha, peaceful stay, courteous front desk.'
+    }
+  };
+
+  const specific = categoryHints[cat];
+  if (specific) {
+    return isEnglish ? `USE VARIED, NATURAL VOCABULARY: ${specific.en}` : `USE VARIED, NATURAL VOCABULARY: ${specific.hi}`;
+  }
+
+  if (isEnglish) {
+    return 'USE VARIED, NATURAL VOCABULARY: Draw from diverse words like crisp, unhurried, patient, attentive, seamless, well-managed, spotless, balanced, straightforward, cozy, pleasant, prompt, considerate, reasonable, calm, neatly maintained.';
+  }
+  return 'USE VARIED, NATURAL VOCABULARY: Draw from diverse spoken words like shandar, badhiya, tasalli se, peaceful, bina kisi hurry ke, clean and neat, pocket-friendly, smooth, sahi kaam, safe, comfortable, accha laga, bina lambe wait ke.';
+};
+
 export function buildReviewGenerationPrompt({
   businessName = 'this business',
   businessCategory = 'restaurant',
@@ -185,7 +537,9 @@ export function buildReviewGenerationPrompt({
   description = '',
   tone = 'natural',
   language = 'Hinglish',
-  businessLocation = ''
+  businessLocation = '',
+  lengthProfile = null,
+  reviewerAngle = null
 }) {
   const tagsText = selectedCategories.length
     ? uniqueText(selectedCategories.map((item) => String(item).trim()).filter(Boolean)).join(', ')
@@ -193,6 +547,13 @@ export function buildReviewGenerationPrompt({
 
   const locationText = String(businessLocation || '').trim();
   const noteText = String(description || '').trim();
+  const profile = (lengthProfile && lengthProfile.instruction)
+    ? lengthProfile
+    : pickRandomLengthProfile(tone, typeof lengthProfile === 'string' ? lengthProfile : 'random');
+
+  const angleInstruction = reviewerAngle || pickRandomReviewerAngle();
+  const vocabHints = getFreshVocabularyHints(language, businessCategory);
+  const randomContextNonce = Math.floor(Math.random() * 1000000);
 
   return [
     'Generate a 100% unique, natural customer review for Google Maps using the details below:',
@@ -203,12 +564,18 @@ export function buildReviewGenerationPrompt({
     `Tone: ${tone}`,
     `Language: ${language}`,
     noteText ? `Customer personal note: ${noteText}` : '',
+    `Reviewer Perspective: ${angleInstruction}`,
+    `Context Reference: #${randomContextNonce}`,
     'CRITICAL RULES FOR MAXIMUM VARIETY & AUTHENTICITY:',
-    '- LENGTH: Exactly 1 to 2 short sentences, maximum 3 (under 35-40 words total).',
+    profile.instruction,
+    '- ABSOLUTELY FORBIDDEN CLICHÉS (DO NOT USE ANY OF THESE WORDS/PHRASES):',
+    ...FORBIDDEN_CLICHES.map((rule) => `  ${rule}`),
+    '- NO CLICHÉ SIGN-OFFS: Never end with predictable marketing formulas like "Highly recommend", "Must visit", "Definitely my new go-to", "Totally worth it", "10/10", or "Ab se regular yahi aunga". End naturally on a concrete observation, or simply stop after stating the facts.',
+    `- ${vocabHints}`,
     '- DIVERSITY & NO TEMPLATES: Never use generic repetitive openers like "Had a great experience", "I recently visited", "Visited this place", or "Great place to". Start directly with what was memorable or a fresh spontaneous thought.',
     '- VARY SENTENCE STRUCTURE: Sometimes start with the atmosphere, sometimes with the service, sometimes with a personal recommendation or casual impression.',
     '- NATURAL VOICE: Sound like a real person writing quickly from their phone on Google Maps.',
-    '- SCRIPT & LANGUAGE: Write strictly in ' + language + (language.toLowerCase() === 'hinglish' ? ' using natural conversational Hinglish in Latin alphabet (casual Hindi + English mix).' : '.'),
+    '- SCRIPT & LANGUAGE: Write strictly in ' + language + (language.toLowerCase() === 'hinglish' ? ' using natural conversational Hinglish in Latin alphabet (casual Hindi + English mix).' : (language.toLowerCase() === 'hindi' ? ' (हिंदी लिपि में) using natural everyday conversational Hindi.' : ' using natural, authentic English.')),
     '- OUTPUT ONLY: Return only the review text. No quotes, no markdown, no greetings, no bullet points, no commentary.'
   ].filter(Boolean).join('\n');
 }
@@ -247,10 +614,10 @@ export async function callGeminiReviewGenerator({
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 1.0,
+          temperature: 1.1,
           topP: 0.95,
           topK: 64,
-          maxOutputTokens: 120
+          maxOutputTokens: 280
         }
       }),
       signal: controller.signal
@@ -307,9 +674,11 @@ export async function callXaiReviewGenerator({
   const response = await client.chat.completions.create({
     model,
     messages: [{ role: 'user', content: prompt }],
-    temperature: 1.0,
+    temperature: 1.1,
     top_p: 0.95,
-    max_tokens: 120
+    presence_penalty: 0.6,
+    frequency_penalty: 0.5,
+    max_tokens: 280
   });
 
   const raw = response?.choices?.[0]?.message?.content;
@@ -337,12 +706,15 @@ export async function generateReviewWithFallback({
   businessSummary = '',
   businessProfileJson = '',
   businessLocation = '',
+  lengthProfile = 'random',
+  length = '',
   llmApiKey = '',
   geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '',
   senseNovaApiKey = process.env.SENSENOVA_API_KEY || process.env.SENSONOVA_API_KEY || '',
   llmRequest = null
 }) {
   const normalized = normalizeReviewInput({ businessName, businessCategory, selectedCategories, tone, language, description, businessLocation });
+  const selectedProfile = pickRandomLengthProfile(normalized.tone, length || lengthProfile || 'random');
   const prompt = buildReviewGenerationPrompt({
     businessName: normalized.businessName,
     businessCategory: normalized.businessCategory,
@@ -350,7 +722,8 @@ export async function generateReviewWithFallback({
     description: normalized.description,
     tone: normalized.tone,
     language: normalized.language,
-    businessLocation: normalized.businessLocation
+    businessLocation: normalized.businessLocation,
+    lengthProfile: selectedProfile
   });
 
   const geminiModel = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
@@ -361,6 +734,7 @@ export async function generateReviewWithFallback({
   console.info(`  • Business: ${normalized.businessName} (${normalized.businessCategory}${normalized.businessLocation ? `, ${normalized.businessLocation}` : ''})`);
   console.info(`  • Selected Tags: ${normalized.selectedCategories.join(', ') || 'None (General positive)'}`);
   console.info(`  • Tone: ${normalized.tone} | Language: ${normalized.language}`);
+  console.info(`  • Target Length Profile: ${selectedProfile.type.toUpperCase()}`);
   console.info(`  • Personal Note: ${normalized.description || 'None'}`);
   console.info(`  • Primary Provider: Google Gemini (${geminiModel})`);
   console.info(`  • Fallback Provider: SenseNova (${senseNovaModel})`);

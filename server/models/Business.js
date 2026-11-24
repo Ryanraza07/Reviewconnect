@@ -35,6 +35,20 @@ const businessSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    email: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    socialLinks: {
+      website: { type: String, default: '' },
+      instagram: { type: String, default: '' },
+      facebook: { type: String, default: '' },
+      whatsapp: { type: String, default: '' },
+      twitter: { type: String, default: '' },
+      youtube: { type: String, default: '' },
+      linkedin: { type: String, default: '' }
+    },
     location: {
       type: String,
       default: ''
@@ -62,7 +76,19 @@ const businessSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ['restaurant', 'salon', 'clinic'],
+      enum: [
+        'restaurant',
+        'salon',
+        'clinic',
+        'general_store',
+        'optical',
+        'pharmacy',
+        'electronics',
+        'fashion',
+        'gym',
+        'automobile',
+        'hotel'
+      ],
       default: 'restaurant'
     },
     description: {

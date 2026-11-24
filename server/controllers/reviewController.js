@@ -12,9 +12,10 @@ const reviewPayload = z.object({
   description: z.string().max(500).optional().default(''),
   businessSummary: z.string().max(800).optional().default(''),
   businessProfileJson: z.string().max(8000).optional().default(''),
-  tone: z.string().default('natural'),
+  tone: z.string().default('random'),
   language: z.string().default('English'),
-  rating: z.number().int().min(1).max(5).optional().default(5)
+  rating: z.number().int().min(1).max(5).optional().default(5),
+  length: z.enum(['short', 'small', 'medium', 'long', 'big', 'random']).optional().default('random')
 });
 
 export const generateReviewForBusiness = async (req, res) => {
@@ -24,7 +25,7 @@ export const generateReviewForBusiness = async (req, res) => {
     return res.status(400).json({ message: 'Invalid review payload.', errors: parsed.error.flatten() });
   }
 
-  const { businessSlug, selectedCategories, description, businessSummary, businessProfileJson, tone, language, rating } = parsed.data;
+  const { businessSlug, selectedCategories, description, businessSummary, businessProfileJson, tone, language, rating, length } = parsed.data;
   const business = (await loadBusinessesFromDb()).find((item) => item.slug === businessSlug) || getBusinessStore().find((item) => item.slug === businessSlug);
 
   if (!business) {
@@ -83,6 +84,7 @@ export const generateReviewForBusiness = async (req, res) => {
       contactName: normalized.contactName,
       contactPhone: normalized.contactPhone,
       businessLocation: normalized.businessLocation,
+      lengthProfile: length,
       geminiApiKey: resolveGeminiApiKey(),
       senseNovaApiKey: resolveSenseNovaApiKey()
     });

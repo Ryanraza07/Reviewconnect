@@ -13,6 +13,15 @@ const demoBusinesses = [
     businessName: 'The Coffee House',
     contactName: 'Aisha Khan',
     contactNumber: '+91 98765 43210',
+    email: 'contact@thecoffeehouse.in',
+    socialLinks: {
+      website: 'https://thecoffeehouse.in',
+      instagram: 'https://instagram.com/thecoffeehouse',
+      facebook: 'https://facebook.com/thecoffeehouse',
+      whatsapp: '+91 98765 43210',
+      twitter: 'https://x.com/thecoffeehouse',
+      youtube: 'https://youtube.com/@thecoffeehouse'
+    },
     location: 'Connaught Place, New Delhi',
     locationLink: 'https://maps.google.com/?q=Connaught+Place+New+Delhi',
     businessSummary: 'Neighborhood café known for artisan coffee, light brunch, and a warm modern atmosphere.',
@@ -48,6 +57,13 @@ const demoBusinesses = [
     businessName: 'Royal Salon Studio',
     contactName: 'Meera Sharma',
     contactNumber: '+91 99887 66554',
+    email: 'info@royalsalonstudio.com',
+    socialLinks: {
+      website: 'https://royalsalonstudio.com',
+      instagram: 'https://instagram.com/royalsalonstudio',
+      facebook: 'https://facebook.com/royalsalonstudio',
+      whatsapp: '+91 99887 66554'
+    },
     location: 'Banjara Hills, Hyderabad',
     locationLink: 'https://maps.google.com/?q=Banjara+Hills+Hyderabad',
     businessSummary: 'Premium salon specializing in hairstyling, grooming, and confidence-boosting personal care.',
@@ -83,6 +99,12 @@ const demoBusinesses = [
     businessName: 'City Dental Clinic',
     contactName: 'Dr. Rohan Mehta',
     contactNumber: '+91 91234 56789',
+    email: 'care@citydentalclinic.com',
+    socialLinks: {
+      website: 'https://citydentalclinic.com',
+      instagram: 'https://instagram.com/citydentalclinic',
+      whatsapp: '+91 91234 56789'
+    },
     location: 'Koramangala, Bengaluru',
     locationLink: 'https://maps.google.com/?q=Koramangala+Bengaluru',
     businessSummary: 'Modern dental clinic focused on preventive care, restorative treatments, and a calm patient experience.',
@@ -109,6 +131,81 @@ const demoBusinesses = [
     supportedLanguages: ['English', 'Hindi', 'Hinglish'],
     reviewCategories: getDefaultReviewCategories('clinic'),
     templateSettings: { enabled: true, defaultTone: 'professional' },
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'biz-general-store',
+    businessName: 'Prime Daily Mart & General Store',
+    contactName: 'Suresh Kumar',
+    contactNumber: '+91 98450 12345',
+    email: 'support@primedailymart.in',
+    socialLinks: {
+      whatsapp: '+91 98450 12345'
+    },
+    location: 'Indiranagar, Bengaluru',
+    locationLink: 'https://maps.google.com/?q=Indiranagar+Bengaluru',
+    businessSummary: 'Well-stocked neighborhood supermarket providing fresh groceries, packaged food, household essentials, and speedy checkout.',
+    businessProfileJson: JSON.stringify({
+      business_name: 'Prime Daily Mart & General Store',
+      category: 'General Store',
+      location: 'Indiranagar, Bengaluru',
+      specialties: ['Daily groceries', 'Fresh supplies', 'Household essentials'],
+      experience_highlights: ['Organized aisles', 'Fast billing', 'Wide product range'],
+      customer_feedback_themes: {
+        positive: ['Stock availability', 'Billing speed', 'Fair pricing'],
+        mixed_or_negative: ['Peak hour rush']
+      }
+    }),
+    slug: 'prime-daily-mart',
+    category: 'general_store',
+    description: 'A well-stocked general store and supermarket for daily essentials and groceries.',
+    logo: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=200&q=80',
+    googleReviewUrl: 'https://www.google.com/search?q=Prime+Daily+Mart+reviews',
+    branding: { primaryColor: '#16a34a', secondaryColor: '#0f172a' },
+    welcomeMessage: 'Thank you for shopping with us! Please share your experience.',
+    supportedLanguages: ['English', 'Hindi', 'Hinglish'],
+    reviewCategories: getDefaultReviewCategories('general_store'),
+    templateSettings: { enabled: true, defaultTone: 'natural' },
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'biz-optical',
+    businessName: 'Vision Care Opticals & Eyewear',
+    contactName: 'Rajesh Sen',
+    contactNumber: '+91 98300 54321',
+    email: 'hello@visioncareopticals.com',
+    socialLinks: {
+      whatsapp: '+91 98300 54321',
+      instagram: 'https://instagram.com/visioncareopticals'
+    },
+    location: 'Park Street, Kolkata',
+    locationLink: 'https://maps.google.com/?q=Park+Street+Kolkata',
+    businessSummary: 'Modern optical boutique offering computerized eye testing, designer frames, precision prescription lenses, and custom fitting.',
+    businessProfileJson: JSON.stringify({
+      business_name: 'Vision Care Opticals & Eyewear',
+      category: 'Optical Shop',
+      location: 'Park Street, Kolkata',
+      specialties: ['Eye testing', 'Prescription glasses', 'Designer sunglasses'],
+      experience_highlights: ['Accurate eye checkup', 'Wide frame collection', 'Quick delivery'],
+      customer_feedback_themes: {
+        positive: ['Testing accuracy', 'Frame collection', 'Staff guidance'],
+        mixed_or_negative: ['Limited parking']
+      }
+    }),
+    slug: 'vision-care-opticals',
+    category: 'optical',
+    description: 'Specialist eyewear and optical shop providing precision eye tests and stylish frames.',
+    logo: 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?auto=format&fit=crop&w=200&q=80',
+    googleReviewUrl: 'https://www.google.com/search?q=Vision+Care+Opticals+reviews',
+    branding: { primaryColor: '#0284c7', secondaryColor: '#0f172a' },
+    welcomeMessage: 'Thank you for choosing Vision Care. We would love your feedback on your glasses and service.',
+    supportedLanguages: ['English', 'Hindi', 'Hinglish'],
+    reviewCategories: getDefaultReviewCategories('optical'),
+    templateSettings: { enabled: true, defaultTone: 'natural' },
     isActive: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
